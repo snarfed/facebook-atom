@@ -102,7 +102,9 @@ class GotAuthCode(webapp2.RequestHandler):
     params = urlparse.parse_qs(resp)
     access_token = params['access_token'][0]
 
-    atom_url = '%s/atom?access_token=%s' % (self.request.host_url, access_token)
+    atom_url = '%s://%s/atom?access_token=%s' % (appengine_config.SCHEME,
+                                                 appengine_config.HOST,
+                                                 access_token)
     logging.info('generated feed URL: %s', atom_url)
     self.response.out.write(template.render(GENERATED_TEMPLATE_FILE,
                                             {'atom_url': atom_url}))
