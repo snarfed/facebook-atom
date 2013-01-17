@@ -26,11 +26,8 @@ GENERATED_TEMPLATE_FILE = os.path.join(os.path.dirname(__file__),
 ATOM_TEMPLATE_FILE = os.path.join(os.path.dirname(__file__),
                                   'activitystreams', 'templates', 'user_feed.atom')
 
-API_HOME_COUNT = 50  # default number of posts returned
-API_HOME_URL = (
-  'https://graph.facebook.com/me?access_token=%%s&fields='
-  'home.limit(%d),id,username,name,link,updated_time,bio,location' %
-  API_HOME_COUNT)
+API_HOME_URL = ('https://graph.facebook.com/me?access_token=%%s&fields='
+                'home.limit(50),id,username,name,link,updated_time,bio,location')
 
 # based on salmon-unofficial/facebook.py.
 # facebook api url templates. can't (easily) use urllib.urlencode() because i
