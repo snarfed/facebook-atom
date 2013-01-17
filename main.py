@@ -26,7 +26,7 @@ GENERATED_TEMPLATE_FILE = os.path.join(os.path.dirname(__file__),
 ATOM_TEMPLATE_FILE = os.path.join(os.path.dirname(__file__),
                                   'activitystreams', 'templates', 'user_feed.atom')
 
-API_HOME_URL = ('https://graph.facebook.com/me?access_token=%%s&fields='
+API_HOME_URL = ('https://graph.facebook.com/me?access_token=%s&fields='
                 'home.limit(50),id,username,name,link,updated_time,bio,location')
 
 # based on salmon-unofficial/facebook.py.
