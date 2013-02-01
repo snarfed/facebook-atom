@@ -3,6 +3,8 @@
 feed, ie posts from your friends.
 
 Based on both plusstreamfeed and salmon-unofficial.
+
+STATE: implementing title w/username
 """
 
 __author__ = 'Ryan Barrett <facebook-atom@ryanb.org>'
