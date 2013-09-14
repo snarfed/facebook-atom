@@ -125,6 +125,14 @@ class AtomHandler(webapp2.RequestHandler):
     posts = resp.get('home', {}).get('data', [])
     activities = [fb.post_to_activity(p) for p in posts]
 
+    # massage data
+    for a in activities:
+      obj = a.setdefault('object', {})
+      who = a.get('actor', {})
+      if 'content' not in obj and obj['objectType'] == 'image':
+        obj['content'] = '%s added a new photo.' % (
+          who.get('displayName') or who.get('username'))
+
     self.response.headers['Content-Type'] = 'text/xml'
     self.response.out.write(template.render(
         ATOM_TEMPLATE_FILE,
