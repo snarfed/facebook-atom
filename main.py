@@ -3,8 +3,6 @@
 feed, ie posts from your friends.
 
 Based on both plusstreamfeed and salmon-unofficial.
-
-STATE: implementing title w/username
 """
 
 __author__ = 'Ryan Barrett <facebook-atom@ryanb.org>'
@@ -22,7 +20,7 @@ from activitystreams.webutil import webapp2
 
 from google.appengine.ext.webapp import template
 
-
+OAUTH_SCOPES = facebook.OAUTH_SCOPES + ',offline_access'
 GENERATED_TEMPLATE_FILE = os.path.join(os.path.dirname(__file__),
                                        'templates', 'generated.html')
 ATOM_TEMPLATE_FILE = os.path.join(os.path.dirname(__file__),
@@ -36,7 +34,7 @@ API_HOME_URL = ('https://graph.facebook.com/me?access_token=%s&fields='
 # want to keep the %(...)s placeholders as is and fill them in later in code.
 # TODO: use appengine_config.py for local mockfacebook vs prod facebook
 GET_AUTH_CODE_URL = '&'.join((
-    'https://www.facebook.com/dialog/oauth/?scope=read_stream,offline_access',
+    'https://www.facebook.com/dialog/oauth/?scope=%s' % OAUTH_SCOPES,
     'client_id=%(client_id)s',
     # redirect_uri here must be the same in the access token request!
     'redirect_uri=%(host_url)s/got_auth_code',
