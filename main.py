@@ -7,7 +7,7 @@ __author__ = 'Ryan Barrett <facebook-atom@ryanb.org>'
 import json
 import logging
 import os
-import urllib
+import urllib2
 
 from activitystreams import appengine_config
 from activitystreams import facebook
@@ -37,6 +37,10 @@ class CallbackHandler(oauth_facebook.CallbackHandler):
                                             {'atom_url': atom_url}))
 
 
+def actor_name(actor):
+  return actor.get('displayName') or actor.get('username') or 'you'
+
+
 class AtomHandler(webapp2.RequestHandler):
   """Proxies the Atom feed for a Facebook user's stream.
 
@@ -47,7 +51,7 @@ class AtomHandler(webapp2.RequestHandler):
   def get(self):
     access_token = self.request.get('access_token')
     assert access_token
-    resp = json.loads(urllib.urlopen(API_HOME_URL % access_token).read())
+    resp = json.loads(urllib2.urlopen(API_HOME_URL % access_token, timeout=999).read())
 
     fb = facebook.Facebook(self)
     actor = fb.user_to_actor(resp)
@@ -59,13 +63,12 @@ class AtomHandler(webapp2.RequestHandler):
       obj = a.setdefault('object', {})
       who = a.get('actor', {})
       if 'content' not in obj and obj['objectType'] == 'image':
-        obj['content'] = '%s added a new photo.' % (
-          who.get('displayName') or who.get('username'))
+        obj['content'] = '%s added a new photo.' % actor_name(who)
 
     self.response.headers['Content-Type'] = 'text/xml'
     self.response.out.write(template.render(
         ATOM_TEMPLATE_FILE,
-        {'title': 'Facebook news feed for %s' % actor['displayName'],
+        {'title': 'Facebook news feed for %s' % actor_name(actor),
          'updated': activities[0]['object'].get('updated') if activities else '',
          'actor': actor,
          'items': activities,
