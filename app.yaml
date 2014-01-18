@@ -8,6 +8,10 @@ default_expiration: 1d
 builtins:
 - remote_api: on
 
+libraries:
+- name: ssl
+  version: latest
+
 handlers:
 - url: /static
   static_dir: static
@@ -29,7 +33,4 @@ skip_files:
 - ^(.*/)?.*/RCS/.*
 - ^(.*/)?\..*
 - ^(.*/)?.*\.bak$
-# don't need anything in the tweepy or webapp-improved subdirs, especially since
-# webapp-improved/lib/ has over 1k files!
-- activitystreams/tweepy_submodule/(docs|examples|tools)/.*
-- activitystreams/webutil/webapp-improved/.*/.*
+- ^(.*/)?(debian|doc|docs|pydocs|python3|ref|samples|tests)/.*
