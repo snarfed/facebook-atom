@@ -17,6 +17,7 @@ import webapp2
 
 from google.appengine.ext.webapp import template
 
+# https://developers.facebook.com/docs/reference/login/
 OAUTH_SCOPES = facebook.OAUTH_SCOPES + ',offline_access'
 GENERATED_TEMPLATE_FILE = os.path.join(os.path.dirname(__file__),
                                        'templates', 'generated.html')
@@ -78,7 +79,7 @@ class AtomHandler(webapp2.RequestHandler):
 
 
 application = webapp2.WSGIApplication(
-  [('/generate', oauth_facebook.StartHandler.to('/got_auth_code')),
+  [('/generate', oauth_facebook.StartHandler.to('/got_auth_code', OAUTH_SCOPES)),
    ('/got_auth_code', CallbackHandler),
    ('/atom', AtomHandler),
    ], debug=appengine_config.DEBUG)
