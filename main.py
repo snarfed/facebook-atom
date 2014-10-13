@@ -83,11 +83,13 @@ class AtomHandler(webapp2.RequestHandler):
       who = a.get('actor', {})
       if 'content' not in obj and obj['objectType'] == 'image':
         obj['content'] = '%s added a new photo.' % actor_name(who)
+    actor = fb.get_actor()
+    title = 'facebook-atom feed for %s' % fb.actor_name(actor)
 
     self.response.headers['Content-Type'] = 'application/atom+xml'
     self.response.out.write(atom.activities_to_atom(
-        activities, fb.get_actor(), host_url=host_url,
-        request_url=self.request.path_url))
+        activities, fb.get_actor(), title=title,
+        host_url=host_url, request_url=self.request.path_url))
 
 
 application = webapp2.WSGIApplication(
