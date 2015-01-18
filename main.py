@@ -47,7 +47,7 @@ class AtomHandler(webapp2.RequestHandler):
     fb = facebook.Facebook(access_token=util.get_required_param(self, 'access_token'))
 
     try:
-      activities = fb.get_activities()
+      activities = fb.get_activities(count=50)
     except urllib2.HTTPError, e:
       # Facebook API error details:
       # https://developers.facebook.com/docs/graph-api/using-graph-api/#receiving-errorcodes
@@ -95,7 +95,7 @@ class AtomHandler(webapp2.RequestHandler):
 application = webapp2.WSGIApplication(
   [('/generate', oauth_facebook.StartHandler.to('/got_auth_code',
         # https://developers.facebook.com/docs/reference/login/
-        facebook.OAUTH_SCOPES + ',offline_access')),
+        'read_stream,offline_access')),
    ('/got_auth_code', CallbackHandler),
    ('/atom', AtomHandler),
    ], debug=appengine_config.DEBUG)
