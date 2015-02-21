@@ -19,6 +19,19 @@ import webapp2
 
 from google.appengine.ext.webapp import template
 
+UPGRADE_MESSAGE = """
+<entry>
+<id>tag:facebook-atom.appspot.com,2013:1</id>
+<title>Please update your Facebook Atom feed</title>
+<content type="xhtml">
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p style="color: red; font-style: italic;"><b>Hi! Thanks for using Facebook Atom feeds. Facebook is changing their API, which means we need to change too. Please <a href="https://facebook-atom.appspot.com/">click here to generate a new feed</a>. Your old feed will stop working on March 7, 2015. Feel free to <a href="https://snarfed.org/about">ping me</a> if you have any questions. Thanks again!</b></p>
+</div>
+</content>
+<published>2013-07-08T20:00:00</published>
+</entry>
+"""
+
 
 class CallbackHandler(oauth_facebook.CallbackHandler):
   def finish(self, auth_entity, state=None):
@@ -86,16 +99,22 @@ class AtomHandler(webapp2.RequestHandler):
     actor = fb.get_actor()
     title = 'facebook-atom feed for %s' % fb.actor_name(actor)
 
-    self.response.headers['Content-Type'] = 'application/atom+xml'
-    self.response.out.write(atom.activities_to_atom(
+    # render atom, including upgrade message
+    output = atom.activities_to_atom(
         activities, fb.get_actor(), title=title,
-        host_url=host_url, request_url=self.request.path_url))
+        host_url=host_url, request_url=self.request.path_url)
+    suffix = '</feed>\n'
+    assert output.endswith(suffix)
+    output = output[-len('suffix'):] + UPGRADE_MESSAGE + suffix
+
+    self.response.headers['Content-Type'] = 'application/atom+xml'
+    self.response.out.write(output)
 
 
 application = webapp2.WSGIApplication(
   [('/generate', oauth_facebook.StartHandler.to('/got_auth_code',
         # https://developers.facebook.com/docs/reference/login/
-        'read_stream,offline_access')),
+        'read_stream')),
    ('/got_auth_code', CallbackHandler),
    ('/atom', AtomHandler),
    ], debug=appengine_config.DEBUG)

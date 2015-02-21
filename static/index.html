@@ -21,9 +21,88 @@
 ie your friends' posts, that you can subscribe to and read in your favorite RSS
 feed reader?</p>
 
-<form method="post" action="/generate" style="text-align: center">
+<script type="text/javascript">
+var timedHide = 0;
+function show(id, height) {
+  window.clearTimeout(timedHide);
+  var ids = ["ss-create-button", "ss-details", "ss-oauth-settings",
+             "ss-authorize", "why-app"];
+  ids.forEach(function (ssid) {
+    var elem = document.getElementById(ssid);
+    elem.height = (ssid == id) ? height : 0;
+    elem.style.opacity = (ssid == id) ? 1 : 0;
+  });
+}
+
+function hide() {
+  timedHide = window.setTimeout(function() { show(null, null); }, 1000 /* ms */);
+}
+</script>
+
+<p>
+First, <a href="https://developers.facebook.com/quickstarts/?platform=web">click
+    here to get a Facebook app id</a>.
+(<a onmouseover="show('why-app', 'auto')" onmouseout="hide()">Why?</a>) Enter
+<a onmouseover="show('ss-details', 491)" onmouseout="hide()">details like these</a>,
+click the
+<a onmouseover="show('ss-create-button', 144)" onmouseout="hide()">checkbox
+ and button</a>,
+and copy and paste the
+<a onmouseover="show('ss-oauth-settings', 200)" onmouseout="hide()">app id and
+ secret</a> below. Hover over these links for help.
+</p>
+
+<div class="screenshots">
+<p id="why-app" style="height: 0 !important"
+   onmouseover="if (this.style.opacity == 1) {
+                  show('why-app', 'auto');
+                }"
+   onmouseout="hide()">
+Facebook <a href="https://developers.facebook.com/docs/facebook-login/permissions/v2.2#reference-read_stream">doesn't
+like it</a> when apps reformat and republish tweets for many different users
+like this. They don't mind if you use your own app to do it just for yourself,
+though.
+</p>
+
+<img id="ss-create-button" width="296" height="0"
+     src="/static/facebook_app_create_button.png" /> <!-- height 144 -->
+<img id="ss-details" width="220" height="0"
+     src="/static/facebook_app_details.png" /> <!-- height 491 -->
+<img id="ss-oauth-settings" width="588" height="0"
+     src="/static/facebook_app_oauth_settings.png" /> <!-- height 200 -->
+</div>
+
+<form method="post" action="/generate" style="text-align: center"
+      onsubmit="if (document.getElementById('app_id').value.trim() == '' ||
+                    document.getElementById('app_secret').value.trim() == '') {
+                  window.alert('You must enter a app id and secret.');
+                  return false;
+                }">
+
+<table id="app">
+<tr><td class="label">
+<label for="app_id">App id</label>
+</td><td>
+<input type="text" id="app_id" name="app_id" />
+</td></tr><tr><td class="label">
+<label for="app_secret">App secret</label>
+</td><td>
+<input type="text" id="app_secret" name="app_secret" />
+</td></tr>
+</table>
+
 <input type="image" alt="Get my feed" src="/static/facebook_get_my_feed.png" />
 </form>
+</div>
+
+<p> When you click one of these buttons, Facebook will ask you if your app should
+be allowed to read your Facebook stream.
+<a onmouseover="show('ss-authorize', 157)" onmouseout="hide()">Click <em>Authorize
+app</em></a> and you'll be redirected back here to get your new feed.</p>
+
+<div class="screenshots">
+<img id="ss-authorize" width="255" height="0"
+     src="/static/facebook_app_authorize.png" /> <!-- height 157 -->
 </div>
 
 <div id="bottom"></div>
