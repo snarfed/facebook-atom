@@ -13,6 +13,10 @@ body, input, textarea {
   font-size: medium;
 }
 
+input {
+  margin-left: .5em;
+}
+
 #body, #graybody {
   clear: both;
   margin: 1em 0 0 1em;
@@ -40,7 +44,7 @@ body, input, textarea {
   -moz-box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
 }
 
-.screenshots > * {
+#screenshots > * {
   opacity: 0;
 
   -moz-transition: width 1s, height 1s, opacity 1s;
@@ -55,18 +59,8 @@ body, input, textarea {
   /* transition-delay: 1s; */
 }
 
-table {
-  margin-left: auto;
-  margin-right: auto;
-  border-spacing: 1em .5em;
-}
-
 #buttons {
   border-spacing: 2em .5em;
-}
-
-td.label {
-  text-align: right;
 }
 
 #bottom {

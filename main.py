@@ -33,11 +33,26 @@ UPGRADE_MESSAGE = """
 """
 
 
-class CallbackHandler(oauth_facebook.CallbackHandler):
-  def finish(self, auth_entity, state=None):
-    """Gets an access token based on an auth code."""
+class GenerateHandler(webapp2.RequestHandler):
+  """Generates a new Atom feed URL. Verifies the access token first.
+  """
+
+  def post(self):
+    token = util.get_required_param(self, 'access_token')
+
+    # verify that the token works
+    fb = facebook.Facebook(token)
+    try:
+      actor = fb.get_actor()
+    except urllib2.HTTPError:
+      logging.exception('Error checking access token')
+      self.response.set_status(403)
+      self.response.out.write(
+        "Oops, that access token isn't working. Please press back and try again!")
+      return
+
     atom_url = '%s/atom?user_id=%s&access_token=%s' % (
-      self.request.host_url, auth_entity.key.id(), auth_entity.access_token())
+      self.request.host_url, actor.get('numeric_id', ''), token)
     logging.info('generated feed URL: %s', atom_url)
     self.response.out.write(template.render(
         os.path.join(os.path.dirname(__file__), 'templates', 'generated.html'),
@@ -102,19 +117,16 @@ class AtomHandler(webapp2.RequestHandler):
     # render atom, including upgrade message
     output = atom.activities_to_atom(
         activities, fb.get_actor(), title=title,
-        host_url=host_url, request_url=self.request.path_url)
-    suffix = '</feed>\n'
-    assert output.endswith(suffix)
-    output = output[-len('suffix'):] + UPGRADE_MESSAGE + suffix
+        host_url=host_url, request_url=self.request.path_url).rstrip()
+    closing_tag = '</feed>'
+    assert output.endswith(closing_tag)
+    output = output[:-len(closing_tag)] + UPGRADE_MESSAGE + closing_tag
 
     self.response.headers['Content-Type'] = 'application/atom+xml'
     self.response.out.write(output)
 
 
 application = webapp2.WSGIApplication(
-  [('/generate', oauth_facebook.StartHandler.to('/got_auth_code',
-        # https://developers.facebook.com/docs/reference/login/
-        'read_stream')),
-   ('/got_auth_code', CallbackHandler),
+  [('/generate', GenerateHandler),
    ('/atom', AtomHandler),
    ], debug=appengine_config.DEBUG)
