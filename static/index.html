@@ -22,57 +22,66 @@ ie your friends' posts, that you can subscribe to and read in your favorite RSS
 feed reader?</p>
 
 <form method="post" action="/generate" style="text-align: center">
-<label for="access_token">Access token:</label>
-<input type="text" required id="access_token" name="access_token" />
+<nobr>
+ <label for="app_id">App id</label>
+ <input type="text" id="app_id" name="app_id" required />
+</nobr>
+&nbsp;
+<nobr>
+ <label for="app_secret">App secret</label>
+ <input type="text" id="app_secret" name="app_secret" required />
+</nobr>
 <br /><br />
+<input type="hidden" name="scope" value="read_stream" />
 <input type="image" alt="Get my feed" src="/static/facebook_get_my_feed.png" />
 </form>
 
 <script type="text/javascript">
-var timedHide = 0;
-function show(num) {
-  window.clearTimeout(timedHide);
-  for (i = 1; i <= 5; i++) {
-    img = document.getElementById("api_explorer_" + i);
-    img.height = (i == num) ? (num == 4 ? 500 : 400) : 0;
-    img.style.opacity = (i == num) ? 1 : 0;
+function show(index) {
+  instructions = document.getElementById("instructions").children;
+  screenshots = document.getElementById("screenshots").children;
+  for (i = 1; i < instructions.length; i++) {
+    instructions[i].children[0].style.backgroundColor =
+      (i == index) ? "#FFA" : "transparent";
+    screenshots[i - 1].style.opacity = (i == index) ? 1 : 0;
   };
-}
-
-function hide() {
-  timedHide = window.setTimeout(function() { show(null); }, 10000 /* ms */);
 }
 </script>
 
 <br />
-<p>You need to get your own access token because Facebook's v2.x API only lets
-apps see your own
-posts, <a href="https://developers.facebook.com/docs/facebook-login/permissions/v2.2#reference-read_stream">not
-your friends'</a>.</p>
+<p>You need your own Facebook app because Facebook
+<a href="https://developers.facebook.com/docs/facebook-login/permissions/v2.2#reference-read_stream">doesn't let apps see your news feed</a>, <em>except</em> if you're
+the app owner. So we make you the app owner!</p>
 
-<p>Here's how to get an access token:</p>
-<ol>
-<li>Open the
- <a href="https://developers.facebook.com/tools/explorer">Facebook Graph API
- Explorer</a>.</li>
-<li><a onmouseover="show(1)" onmouseout="hide()">
- Click the <em>Get Access Token</em> button.</a></li>
-<li><a onmouseover="show(2)" onmouseout="hide()">
- Click <em>Extended Permissions</em></a>.</li>
-<li><a onmouseover="show(3)" onmouseout="hide()">
- Click the <em>read_stream</em> checkbox</a>.</li>
-<li><a onmouseover="show(4)" onmouseout="hide()">
- Click the <em>Get Access Token</em> button</a>.</li>
-<li><a onmouseover="show(5)" onmouseout="hide()">
- Copy the access token</a> into the text box above.</li>
+<p>Here's how to create your app:</p>
+<ol id="instructions">
+<li><a href="https://developers.facebook.com/quickstarts/?platform=web">Click
+ here to create a new Facebook app.</a></li>
+<li><a onmouseover="show(1)">
+ Enter <em>My Atom Feeds</em> in the text box, then click <em>Create New
+ Facebook App ID</em>.</a></li>
+<li><a onmouseover="show(2)">
+ Select <em>Utilities</em> in the <em>Category</em> drop-down, then click
+ <em>Create App ID</em>.</a></li>
+<li><a onmouseover="show(3)">
+ Enter <em>https://facebook-atom.appspot.com/</em> as
+ the <em>Site URL</em>, then click <em>Next</em>.</a></li>
+<li><a onmouseover="show(4)">
+ Click <em>Skip to Developer Dashboard</em>.</a></li>
+<li><a onmouseover="show(5)">
+ Click the <em>Show</em> button next to <em>App Secret</em>. Enter your
+ password if Facebook asks you for it.</a></li>
+<li><a onmouseover="show(6)">
+ Copy the App ID and App Secret into the text boxes above.</a></li>
 </ol>
 
 <div id="screenshots">
-<img id="api_explorer_1" width="940" height="0" src="/static/api_explorer_1.png" />
-<img id="api_explorer_2" width="940" height="0" src="/static/api_explorer_2.png" />
-<img id="api_explorer_3" width="940" height="0" src="/static/api_explorer_3.png" />
-<img id="api_explorer_4" width="940" height="0" src="/static/api_explorer_4.png" />
-<img id="api_explorer_5" width="940" height="0" src="/static/api_explorer_5.png" />
+<img src="/static/new_app_1.png" class="initial" />
+<img src="/static/new_app_2.png" />
+<img src="/static/new_app_3.png" />
+<img src="/static/new_app_4.png" />
+<img src="/static/new_app_5.png" />
+<img src="/static/new_app_6.png" />
 </div>
 </div>
 

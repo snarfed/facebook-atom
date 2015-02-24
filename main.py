@@ -7,11 +7,13 @@ __author__ = 'Ryan Barrett <facebook-atom@ryanb.org>'
 import json
 import logging
 import os
+import urllib
 import urllib2
 
 from activitystreams import appengine_config
 from activitystreams import atom
 from activitystreams import facebook
+from activitystreams.oauth_dropins import appengine_config as oauth_config
 from activitystreams.oauth_dropins import facebook as oauth_facebook
 from activitystreams.oauth_dropins.webutil import handlers
 from activitystreams.oauth_dropins.webutil import util
@@ -24,8 +26,18 @@ UPGRADE_MESSAGE = """
 <id>tag:facebook-atom.appspot.com,2013:1</id>
 <title>Please update your Facebook Atom feed</title>
 <content type="xhtml">
-<div xmlns="http://www.w3.org/1999/xhtml">
-<p style="color: red; font-style: italic;"><b>Hi! Thanks for using Facebook Atom feeds. Facebook is changing their API, which means we need to change too. Please <a href="https://facebook-atom.appspot.com/">click here to generate a new feed</a>. Your old feed will stop working on March 7, 2015. Feel free to <a href="https://snarfed.org/about">ping me</a> if you have any questions. Thanks again!</b></p>
+<div xmlns="http://www.w3.org/1999/xhtml" style="color: red; font-style: italic;">
+<p><b>Hi! Thanks for using Facebook Atom feeds. Facebook is changing their API,
+which means we need to change too. Please
+<a href="https://facebook-atom.appspot.com/">click here to generate a new feed</a>.
+Your old feed will stop working on March 7, 2015.</b></p>
+
+<p>The API changes also mean these new feeds may sometimes be incomplete. We
+don't fully understand why yet, but we're working on it. Apologies in
+advance!</p>
+
+<p>Feel free to <a href="https://snarfed.org/about">ping me</a> if you have any
+questions. Thanks again!</p>
 </div>
 </content>
 <published>2013-07-08T20:00:00</published>
@@ -34,25 +46,56 @@ UPGRADE_MESSAGE = """
 
 
 class GenerateHandler(webapp2.RequestHandler):
-  """Generates a new Atom feed URL. Verifies the access token first.
+  """Custom OAuth start handler so we can include app id/secret in the callback.
   """
-
   def post(self):
-    token = util.get_required_param(self, 'access_token')
+    app_id = util.get_required_param(self, 'app_id')
+    app_secret = util.get_required_param(self, 'app_secret')
 
-    # verify that the token works
-    fb = facebook.Facebook(token)
-    try:
-      actor = fb.get_actor()
-    except urllib2.HTTPError:
-      logging.exception('Error checking access token')
-      self.response.set_status(403)
-      self.response.out.write(
-        "Oops, that access token isn't working. Please press back and try again!")
+    # monkey patch app id so that oauth-dropins uses it instead of the files
+    oauth_config.FACEBOOK_APP_ID = app_id
+    oauth_config.FACEBOOK_APP_SECRET = app_secret
+
+    url = '/got_auth_code?%s' % urllib.urlencode({'app_id': app_id,
+                                                  'app_secret': app_secret})
+    # self.request.params['scope'] = 'read_stream'
+    # class StartHandler(oauth_facebook.StartHandler):
+    #   scope = 'read_stream'
+    # the scope param is set to 'read_stream' in the form in index.html
+    handler = oauth_facebook.StartHandler.to(url)(self.request, self.response)
+    return handler.post()
+
+
+class CallbackHandler(oauth_facebook.CallbackHandler):
+  """The OAuth callback. Generates a new feed URL."""
+
+  def get(self):
+    # monkey patch app id so that oauth-dropins uses it instead of the files
+    oauth_config.FACEBOOK_APP_ID = util.get_required_param(self, 'app_id')
+    oauth_config.FACEBOOK_APP_SECRET = util.get_required_param(self, 'app_secret')
+    super(CallbackHandler, self).get()
+
+  def request_url_with_state(self):
+    """Used as redirect_uri. Override to add app_id and app_secret."""
+    return '%s?%s' % (self.request.path_url, urllib.urlencode({
+      'app_id': self.request.get('app_id'),
+      'app_secret': self.request.get('app_secret'),
+    }))
+
+  def finish(self, auth_entity, state=None):
+    if not auth_entity:
+      logging.info('User declined Facebook auth prompt')
+      self.response.set_status(400)
+      self.response.out.write("You need to approve the Facebook prompt. "
+                              "<a href='/'>Click here to try again.</a>")
       return
 
-    atom_url = '%s/atom?user_id=%s&access_token=%s' % (
-      self.request.host_url, actor.get('numeric_id', ''), token)
+    atom_url = '%s/atom?%s' % (self.request.host_url, urllib.urlencode({
+        'app_id': util.get_required_param(self, 'app_id'),
+        'app_secret': util.get_required_param(self, 'app_secret'),
+        'user_id': auth_entity.key.id(),
+        'access_token': auth_entity.access_token(),
+      }))
     logging.info('generated feed URL: %s', atom_url)
     self.response.out.write(template.render(
         os.path.join(os.path.dirname(__file__), 'templates', 'generated.html'),
@@ -128,5 +171,6 @@ class AtomHandler(webapp2.RequestHandler):
 
 application = webapp2.WSGIApplication(
   [('/generate', GenerateHandler),
+   ('/got_auth_code', CallbackHandler),
    ('/atom', AtomHandler),
    ], debug=appengine_config.DEBUG)

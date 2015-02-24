@@ -44,19 +44,39 @@ input {
   -moz-box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
 }
 
-#screenshots > * {
+#app {
+  margin-left: auto;
+  margin-right: auto;
+  border-spacing: 1em .5em;
+}
+
+#app td.label {
+  text-align: right;
+}
+
+label {
+  font-weight: bold;
+}
+
+#screenshots, #screenshots > img {
+  position: relative;
+  width: 940px;
+  height: 540px;
+}
+
+#screenshots > img {
+  position: absolute;
+  left: 0;
   opacity: 0;
 
-  -moz-transition: width 1s, height 1s, opacity 1s;
-  -webkit-transition: width 1s, height 1s, opacity 1s;
-  -o-transition: width 1s, height 1s, opacity 1s;
-  transition: width 1s, height 1s, opacity 1s;
+  -moz-transition: opacity .5s ease-in-out;
+  -webkit-transition: opacity .5s ease-in-out;
+  -o-transition: opacity .5s ease-in-out;
+  transition: opacity .5s ease-in-out;
+}
 
-  /* I wanted to use this to delay the fade out, but it affects the fade in too. */
-  /* -moz-transition-delay: 1s; */
-  /* -webkit-transition-delay: 1s; */
-  /* -o-transition-delay: 1s; */
-  /* transition-delay: 1s; */
+#screenshots > img.initial {
+  opacity: 1;
 }
 
 #buttons {
