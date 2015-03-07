@@ -30,11 +30,7 @@ UPGRADE_MESSAGE = """
 <p><b>Hi! Thanks for using Facebook Atom feeds. Facebook is changing their API,
 which means we need to change too. Please
 <a href="https://facebook-atom.appspot.com/">click here to generate a new feed</a>.
-Your old feed will stop working on March 7, 2015.</b></p>
-
-<p>The API changes also mean these new feeds may sometimes be incomplete. We
-don't fully understand why yet, but we're working on it. Apologies in
-advance!</p>
+Your old feed stops working on April 30, 2015.</b></p>
 
 <p>Feel free to <a href="https://snarfed.org/about">ping me</a> if you have any
 questions. Thanks again!</p>
