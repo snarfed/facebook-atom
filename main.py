@@ -36,7 +36,8 @@ Your old feed stops working on April 30, 2015.</b></p>
 questions. Thanks again!</p>
 </div>
 </content>
-<published>2013-07-08T20:00:00</published>
+<published>2013-07-08T20:00:00+00:00</published>
+<updated>2013-07-08T20:00:00+00:00</updated>
 </entry>
 """
 
