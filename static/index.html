@@ -32,7 +32,14 @@ feed reader?</p>
  <input type="text" id="app_secret" name="app_secret" required />
 </nobr>
 <br /><br />
-<input type="hidden" name="scope" value="read_stream" />
+<!-- Don't ask for read_stream because it's deprecated in API v2.4, and
+  -- requesting it causes an error. (We use 2.2, but FB doesn't let apps use API
+  -- versions from before they were created, so recent users will still get --
+  -- 2.4.)
+  --- ...except /me/home doesn't work without it. argh.
+  -- https://github.com/snarfed/facebook-atom/issues/6
+  -->
+<!-- <input type="hidden" name="scope" value="read_stream" /> -->
 <input type="image" alt="Get my feed" src="/static/facebook_get_my_feed.png" />
 </form>
 
