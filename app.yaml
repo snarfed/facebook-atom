@@ -29,6 +29,10 @@ handlers:
   script: main.application
   secure: always
 
+- url: /cookie
+  script: cookie.application
+  secure: always
+
 skip_files:
 - ^(.*/)?.*\.py[co]
 - ^(.*/)?.*/RCS/.*
