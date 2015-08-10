@@ -1,6 +1,7 @@
 """Fetch m.facebook.com with a cookie and convert it.
 """
 
+import datetime
 import logging
 import re
 import urllib
@@ -11,24 +12,30 @@ from activitystreams.oauth_dropins.webutil import util
 from bs4 import BeautifulSoup
 import webapp2
 
-ATOM_HEADER = """
+HEADER = """\
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom">
 <id>https://facebook-atom.appspot.com/cookie</id>
 <title>facebook-atom cookie feed</title>
 <logo>https://static.xx.fbcdn.net/rsrc.php/v2/yp/r/eZuLK-TGwK1.png</logo>
+<updated>%(updated)s</updated>
 
 <link href="https://m.facebook.com/" rel="alternate" type="text/html" />
 <link href="https://facebook-atom.appspot.com/cookie"
       rel="self" type="application/atom+xml" />
 """
+FOOTER = """
+</feed>
+"""
   # <id>{{ activity.url }}</id>
   # <title>{{ activity.title|safe }}</title>
-ATOM_ENTRY = """
+ENTRY = u"""
 <entry>
+  <id>%(id)s</id>
+  <title>%(title)s</title>
   <content type="xhtml">
   <div xmlns="http://www.w3.org/1999/xhtml">
-    %s
+    %(content)s
   </div>
   </content>
 </entry>
@@ -55,13 +62,21 @@ class CookieHandler(webapp2.RequestHandler):
     logging.info('Response: %s', resp.getcode())
     assert resp.getcode() == 200
 
-    soup = BeautifulSoup(body)
-    posts = [p.prettify().encode('utf-8')
-             for p in soup.find_all(id=re.compile('u_0_.'))]
+    parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T')}]
+    for post in BeautifulSoup(body).find_all(id=re.compile('u_0_.')):
+      link = post.find(text='Full Story')
+      if link:
+        entry = ENTRY % {
+          'id': 'https://m.facebook.com' + link.parent['href'],
+          'title': unicode(post.div.get_text(' - '))[:100],
+          'content': post.prettify()
+        }
+        parts.append(entry.encode('utf-8'))
+
+    parts += [FOOTER]
 
     self.response.headers['Content-Type'] = 'application/atom+xml'
-    self.response.out.write(''.join(
-      [ATOM_HEADER] + [ATOM_ENTRY % p for p in posts] + ['</feed>']))
+    self.response.out.write(''.join(parts))
 
 
 application = webapp2.WSGIApplication(
