@@ -69,10 +69,11 @@ class CookieHandler(webapp2.RequestHandler):
                   if name not in OMIT_URL_PARAMS]
         url = urlparse.urlunparse(('https', 'm.facebook.com', parsed.path,
                                    '', urllib.urlencode(params), ''))
+        content = post.prettify().replace('href="/', 'href="https://m.facebook.com/')
         entry = ENTRY % {
           'id': url,
-          'title': unicode(post.div.get_text(' - '))[:100],
-          'content': post.prettify()
+          'title': unicode(post.div.get_text(' '))[:100],
+          'content': content,
         }
         parts.append(entry.encode('utf-8'))
 
