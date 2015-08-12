@@ -6,6 +6,7 @@ import logging
 import re
 import urllib
 import urllib2
+import urlparse
 
 from activitystreams.oauth_dropins.webutil import handlers
 from activitystreams.oauth_dropins.webutil import util
@@ -27,8 +28,6 @@ HEADER = """\
 FOOTER = """
 </feed>
 """
-  # <id>{{ activity.url }}</id>
-  # <title>{{ activity.title|safe }}</title>
 ENTRY = u"""
 <entry>
   <id>%(id)s</id>
@@ -40,8 +39,7 @@ ENTRY = u"""
   </content>
 </entry>
 """
-# <link rel="alternate" type="text/html" href="{{ activity.url }}" />
-# <link rel="self" type="application/atom+xml" href="{{ activity.url }}" />
+OMIT_URL_PARAMS = {'bacr', '_ft_', 'refid'}
 
 
 class CookieHandler(webapp2.RequestHandler):
@@ -66,8 +64,13 @@ class CookieHandler(webapp2.RequestHandler):
     for post in BeautifulSoup(body).find_all(id=re.compile('u_0_.')):
       link = post.find(text='Full Story')
       if link:
+        parsed = urlparse.urlparse(link.parent['href'])
+        params = [(name, val) for name, val in urlparse.parse_qsl(parsed.query)
+                  if name not in OMIT_URL_PARAMS]
+        url = urlparse.urlunparse(('https', 'm.facebook.com', parsed.path,
+                                   '', urllib.urlencode(params), ''))
         entry = ENTRY % {
-          'id': 'https://m.facebook.com' + link.parent['href'],
+          'id': url,
           'title': unicode(post.div.get_text(' - '))[:100],
           'content': post.prettify()
         }
