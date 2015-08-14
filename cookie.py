@@ -15,13 +15,13 @@ import webapp2
 HEADER = """\
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom">
-<id>https://facebook-atom.appspot.com/cookie</id>
+<id>https://facebook-atom.appspot.com/</id>
 <title>facebook-atom feed</title>
 <logo>https://static.xx.fbcdn.net/rsrc.php/v2/yp/r/eZuLK-TGwK1.png</logo>
 <updated>%(updated)s</updated>
 
 <link href="https://m.facebook.com/" rel="alternate" type="text/html" />
-<link href="https://facebook-atom.appspot.com/cookie"
+<link href="https://facebook-atom.appspot.com/"
       rel="self" type="application/atom+xml" />
 """
 FOOTER = """
@@ -45,10 +45,11 @@ class CookieHandler(webapp2.RequestHandler):
 
   def get(self):
     try:
-      cookie = 'c_user=%(c_user)s; xs=%(xs)s' % self.request.params
+      cookie = urllib.unquote('c_user=%(c_user)s; xs=%(xs)s' % self.request.params)
     except KeyError:
       return self.abort(400, 'Query parameters c_user and xs are required')
 
+    logging.info('Fetching with Cookie: %s', cookie)
     resp = urllib2.urlopen(urllib2.Request(
       'https://m.facebook.com/',
       headers={
