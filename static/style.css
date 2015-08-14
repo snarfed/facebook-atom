@@ -6,15 +6,12 @@ body {
   margin-top: 2em;
   overflow-y: scroll;
   max-width: 800px;
-}
-
-body, textarea {
   font-family: Arial, sans-serif;
   font-size: medium;
 }
 
-label, textarea {
-  margin-left: .5em;
+label, input, #link {
+  margin-left: 1em;
 }
 
 #body, #graybody {

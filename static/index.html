@@ -7,13 +7,16 @@
 
 <script type="text/javascript">
 function render() {
-  c_user = document.getElementById("c_user").value;
-  xs = document.getElementById("xs").value;
-  link = document.getElementById("link");
+  c_user = document.getElementById("c_user").value.trim();
+  xs = document.getElementById("xs").value.trim();
 
-  link.innerHTML = window.location + "cookie?c_user=" +
-    encodeURIComponent(c_user) + "&xs=" + encodeURIComponent(xs);
-  link.href = (c_user && xs) ? link.innerHTML : null;
+  document.getElementById("link-div").style.color =
+    (c_user && xs) ? "black" : "lightgray";
+
+  url = window.location + "cookie?c_user=" + encodeURIComponent(c_user) +
+    "&xs=" + encodeURIComponent(xs);
+  document.getElementById("link").innerHTML =
+    (c_user && xs) ? "<a href='" + url + "'>" + url + "</a>" : url;
 }
 window.onload = render;
 </script>
@@ -44,7 +47,10 @@ and <code>xs</code> from your browser and paste them below.</p>
  <input type="text" id="xs" onChange="render()" onKeyUp="render()" />
 </nobr>
 
-<p><a id="link"></a></p>
+<div id="link-div">
+<p>Now add this link to your feed reader, and you're done!</p>
+<p id="link">></p>
+</div>
 
 <p id="privacy" class="lead">
 This app does <em style="font-style: normal">not</em> store or use your Facebook
