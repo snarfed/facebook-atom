@@ -1,1 +1,6 @@
-activitystreams/.gitignore
+/build/
+/dist/
+/.eggs/
+/*.egg-info
+/l
+/local/

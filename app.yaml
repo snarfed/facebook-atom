@@ -9,6 +9,8 @@ builtins:
 - remote_api: on
 
 libraries:
+- name: lxml
+  version: latest
 - name: ssl
   version: latest
 

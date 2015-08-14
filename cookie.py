@@ -8,6 +8,7 @@ import urllib
 import urllib2
 import urlparse
 
+import appengine_config
 from bs4 import BeautifulSoup
 import webapp2
 
@@ -59,7 +60,7 @@ class CookieHandler(webapp2.RequestHandler):
     assert resp.getcode() == 200
 
     parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T')}]
-    for post in BeautifulSoup(body).find_all(id=re.compile('u_0_.')):
+    for post in BeautifulSoup(body, 'html.parser').find_all(id=re.compile('u_0_.')):
       link = post.find(text='Full Story')
       if link:
         parsed = urlparse.urlparse(link.parent['href'])
