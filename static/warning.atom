@@ -3,7 +3,7 @@
 <id>https://facebook-atom.appspot.com/</id>
 <title>facebook-atom feed</title>
 <logo>https://static.xx.fbcdn.net/rsrc.php/v2/yp/r/eZuLK-TGwK1.png</logo>
-<updated>2015-08-15T20:00:00+00:00</updated>
+<updated>2015-08-14T15:00:00+00:00</updated>
 
 <link href="https://m.facebook.com/" rel="alternate" type="text/html" />
 <link href="https://facebook-atom.appspot.com/"
@@ -20,8 +20,8 @@
       feed</a>. Apologies for the inconvenience! </b></p>
     </div>
   </content>
-  <published>2015-08-15T20:00:00+00:00</published>
-  <updated>2015-08-15T20:00:00+00:00</updated>
+  <published>2015-08-14T15:00:00+00:00</published>
+  <updated>2015-08-14T15:00:00+00:00</updated>
 </entry>
 
 </feed>
