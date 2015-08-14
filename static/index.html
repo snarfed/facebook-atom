@@ -13,8 +13,7 @@ function render() {
   document.getElementById("link-div").style.color =
     (c_user && xs) ? "black" : "lightgray";
 
-  url = window.location + "cookie?c_user=" + encodeURIComponent(c_user) +
-    "&xs=" + encodeURIComponent(xs);
+  url = window.location + "cookie?c_user=" + c_user + "&xs=" + xs;
   document.getElementById("link").innerHTML =
     (c_user && xs) ? "<a href='" + url + "'>" + url + "</a>" : url;
 }

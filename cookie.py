@@ -45,7 +45,7 @@ class CookieHandler(webapp2.RequestHandler):
 
   def get(self):
     try:
-      cookie = urllib.unquote('c_user=%(c_user)s; xs=%(xs)s' % self.request.params)
+      cookie = 'c_user=%(c_user)s; xs=%(xs)s' % self.request.params
     except KeyError:
       return self.abort(400, 'Query parameters c_user and xs are required')
 
