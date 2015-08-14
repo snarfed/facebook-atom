@@ -1,15 +1,25 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Facebook Atom feeds</title>
-  <link href="/static/style.css" rel="stylesheet" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Facebook Atom feeds</title>
+<link href="/static/style.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+function render() {
+  c_user = document.getElementById("c_user").value;
+  xs = document.getElementById("xs").value;
+  link = document.getElementById("link");
+
+  link.innerHTML = window.location + "cookie?c_user=" +
+    encodeURIComponent(c_user) + "&xs=" + encodeURIComponent(xs);
+  link.href = (c_user && xs) ? link.innerHTML : null;
+}
+window.onload = render;
+</script>
 </head>
 
 <body>
-
 <div id="header">
   <a href="/"><img id="logo" src="/static/facebook_rss_small.jpg"></img></a>
   <p id="title"><span>Facebook Atom feeds</span></p>
@@ -21,82 +31,33 @@
 ie your friends' posts, that you can subscribe to and read in your favorite RSS
 feed reader?</p>
 
-<form method="post" action="/generate" style="text-align: center">
+<p><a href="http://www.wikihow.com/View-Cookies">Follow these instructions</a>
+to extract the two <code>facebook.com</code> cookies named <code>c_user</code>
+and <code>xs</code> from your browser and paste them below.</p>
+
 <nobr>
- <label for="app_id">App id</label>
- <input type="text" id="app_id" name="app_id" required />
+ <label for="c_user">c_user</label>
+ <input type="text" id="c_user" onChange="render()" onKeyUp="render()" />
 </nobr>
-&nbsp;
 <nobr>
- <label for="app_secret">App secret</label>
- <input type="text" id="app_secret" name="app_secret" required />
+ <label for="xs">xs</label>
+ <input type="text" id="xs" onChange="render()" onKeyUp="render()" />
 </nobr>
-<br /><br />
-<!-- Don't ask for read_stream because it's deprecated in API v2.4, and
-  -- requesting it causes an error. (We use 2.2, but FB doesn't let apps use API
-  -- versions from before they were created, so recent users will still get --
-  -- 2.4.)
-  --- ...except /me/home doesn't work without it. argh.
-  -- https://github.com/snarfed/facebook-atom/issues/6
-  -->
-<!-- <input type="hidden" name="scope" value="read_stream" /> -->
-<input type="image" alt="Get my feed" src="/static/facebook_get_my_feed.png" />
-</form>
 
-<script type="text/javascript">
-function show(index) {
-  instructions = document.getElementById("instructions").children;
-  screenshots = document.getElementById("screenshots").children;
-  for (i = 1; i < instructions.length; i++) {
-    instructions[i].children[0].style.backgroundColor =
-      (i == index) ? "#FFA" : "transparent";
-    screenshots[i - 1].style.opacity = (i == index) ? 1 : 0;
-  };
-}
-</script>
+<p><a id="link"></a></p>
 
-<br />
-<p>You need your own Facebook app because Facebook
-<a href="https://developers.facebook.com/docs/facebook-login/permissions/v2.2#reference-read_stream">doesn't let apps see your news feed</a>, <em>except</em> if you're
-the app owner. So we make you the app owner!</p>
-
-<p>Here's how to create your app:</p>
-<ol id="instructions">
-<li><a href="https://developers.facebook.com/quickstarts/?platform=web">Click
- here to create a new Facebook app.</a></li>
-<li><a onmouseover="show(1)">
- Enter <em>My Atom Feeds</em> in the text box, then click <em>Create New
- Facebook App ID</em>.</a></li>
-<li><a onmouseover="show(2)">
- Select <em>Utilities</em> in the <em>Category</em> drop-down, then click
- <em>Create App ID</em>.</a></li>
-<li><a onmouseover="show(3)">
- Enter <em>https://facebook-atom.appspot.com/</em> as
- the <em>Site URL</em>, then click <em>Next</em>.</a></li>
-<li><a onmouseover="show(4)">
- Click <em>Skip to Developer Dashboard</em>.</a></li>
-<li><a onmouseover="show(5)">
- Click the <em>Show</em> button next to <em>App Secret</em>. Enter your
- password if Facebook asks you for it.</a></li>
-<li><a onmouseover="show(6)">
- Copy the App ID and App Secret into the text boxes above.</a></li>
-</ol>
-
-<div id="screenshots">
-<img src="/static/new_app_1.png" class="initial" />
-<img src="/static/new_app_2.png" />
-<img src="/static/new_app_3.png" />
-<img src="/static/new_app_4.png" />
-<img src="/static/new_app_5.png" />
-<img src="/static/new_app_6.png" />
-</div>
-</div>
+<p id="privacy" class="lead">
+This app does <em style="font-style: normal">not</em> store or use your Facebook
+data, username, password, or cookie. It only reformats your news feed and passes
+it to your feed reader when requested. You can confirm by
+<a href="https://github.com/snarfed/facebook-atom">examining its source code</a>.
+</p>
 
 <div id="bottom"></div>
 
 <div id="footer">
-  <a href="http://snarfed.org/about">Questions?</a>
-  | <a href="https://github.com/snarfed/facebook-atom">Source</a>
+  <a href="https://github.com/snarfed/facebook-atom">Source</a>
+  | <a href="https://github.com/snarfed/facebook-atom/issues">Questions?</a>
   | <a href="http://code.google.com/appengine/">
       <img src="/static/appengine_button_noborder.gif" /></a>
 </div>

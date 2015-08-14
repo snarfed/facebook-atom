@@ -8,12 +8,12 @@ body {
   max-width: 800px;
 }
 
-body, input, textarea {
+body, textarea {
   font-family: Arial, sans-serif;
   font-size: medium;
 }
 
-input {
+label, textarea {
   margin-left: .5em;
 }
 
@@ -44,39 +44,8 @@ input {
   -moz-box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
 }
 
-#app {
-  margin-left: auto;
-  margin-right: auto;
-  border-spacing: 1em .5em;
-}
-
-#app td.label {
-  text-align: right;
-}
-
 label {
   font-weight: bold;
-}
-
-#screenshots, #screenshots > img {
-  position: relative;
-  width: 940px;
-  height: 540px;
-}
-
-#screenshots > img {
-  position: absolute;
-  left: 0;
-  opacity: 0;
-
-  -moz-transition: opacity .5s ease-in-out;
-  -webkit-transition: opacity .5s ease-in-out;
-  -o-transition: opacity .5s ease-in-out;
-  transition: opacity .5s ease-in-out;
-}
-
-#screenshots > img.initial {
-  opacity: 1;
 }
 
 #buttons {
@@ -97,6 +66,10 @@ label {
 
 .error {
   color: red;
+  font-style: italic;
+}
+
+#privacy {
   font-style: italic;
 }
 
@@ -130,8 +103,3 @@ img#logo {
   padding-bottom: .5em;
   margin-top: -1em;
 }
-
-/* for debugging */
-/* * { */
-/*   border: 1px solid green; */
-/* } */

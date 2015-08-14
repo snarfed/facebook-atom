@@ -1,4 +1,4 @@
-"""Fetch m.facebook.com with a cookie and convert it.
+"""Fetch m.facebook.com with a cookie and convert it to Atom.
 """
 
 import datetime
@@ -8,8 +8,6 @@ import urllib
 import urllib2
 import urlparse
 
-from activitystreams.oauth_dropins.webutil import handlers
-from activitystreams.oauth_dropins.webutil import util
 from bs4 import BeautifulSoup
 import webapp2
 
@@ -17,7 +15,7 @@ HEADER = """\
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom">
 <id>https://facebook-atom.appspot.com/cookie</id>
-<title>facebook-atom cookie feed</title>
+<title>facebook-atom feed</title>
 <logo>https://static.xx.fbcdn.net/rsrc.php/v2/yp/r/eZuLK-TGwK1.png</logo>
 <updated>%(updated)s</updated>
 
@@ -43,17 +41,17 @@ OMIT_URL_PARAMS = {'bacr', '_ft_', 'refid'}
 
 
 class CookieHandler(webapp2.RequestHandler):
-  handle_exception = handlers.handle_exception
 
   def get(self):
-    cookie = urllib.unquote_plus(util.get_required_param(self, 'cookie'))
-    logging.info('Cookie: %s', cookie)
+    try:
+      cookie = 'c_user=%(c_user)s; xs=%(xs)s' % self.request.params
+    except KeyError:
+      return self.abort(400, 'Query parameters c_user and xs are required')
 
     resp = urllib2.urlopen(urllib2.Request(
       'https://m.facebook.com/',
       headers={
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
-        'DNT': '1',
         'Cookie': cookie,
       }))
     body = resp.read()

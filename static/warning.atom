@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom">
+<id>https://facebook-atom.appspot.com/</id>
+<title>facebook-atom feed</title>
+<logo>https://static.xx.fbcdn.net/rsrc.php/v2/yp/r/eZuLK-TGwK1.png</logo>
+<updated>2015-08-15T20:00:00+00:00</updated>
+
+<link href="https://m.facebook.com/" rel="alternate" type="text/html" />
+<link href="https://facebook-atom.appspot.com/"
+      rel="self" type="application/atom+xml" />
+
+<entry>
+  <id>tag:facebook-atom.appspot.com,2015:2</id>
+  <title>Please update your Facebook Atom feed</title>
+  <content type="xhtml">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="color: red; font-style: italic;">
+      <p><b>Hi! Thanks for using Facebook Atom feeds. Facebook is changing their
+      API (again!) in October 2015, which means we're changing too. Please
+      <a href="https://facebook-atom.appspot.com/">click here to generate a new
+      feed</a>. Apologies for the inconvenience! </b></p>
+    </div>
+  </content>
+  <published>2015-08-15T20:00:00+00:00</published>
+  <updated>2015-08-15T20:00:00+00:00</updated>
+</entry>
+
+</feed>
