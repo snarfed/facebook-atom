@@ -60,8 +60,12 @@ class CookieHandler(webapp2.RequestHandler):
     logging.info('Response: %s', resp.getcode())
     assert resp.getcode() == 200
 
+    soup = BeautifulSoup(body, 'html.parser')
+    if not soup.find('a', href=re.compile('^/logout.php')):
+      return self.abort(401, "Couldn't log into Facebook with cookie %s" % cookie)
+
     parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T')}]
-    for post in BeautifulSoup(body, 'html.parser').find_all(id=re.compile('u_0_.')):
+    for post in soup.find_all(id=re.compile('u_0_.')):
       link = post.find(text='Full Story')
       if link:
         parsed = urlparse.urlparse(link.parent['href'])
