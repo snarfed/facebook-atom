@@ -64,22 +64,37 @@ class CookieHandler(webapp2.RequestHandler):
     if not soup.find('a', href=re.compile('^/logout.php')):
       return self.abort(401, "Couldn't log into Facebook with cookie %s" % cookie)
 
+    home_link = soup.find('a', href=re.compile(
+      r'/[^?]+\?ref_component=mbasic_home_bookmark.*'))
+    if home_link:
+      href = home_link['href']
+      logging.info('Logged in for user %s', href[1:href.find('?')])
+    else:
+      logging.warning("Couldn't determine username or id!")
+
     parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T')}]
     for post in soup.find_all(id=re.compile('u_0_.')):
-      link = post.find(text='Full Story')
-      if link:
-        parsed = urlparse.urlparse(link.parent['href'])
-        params = [(name, val) for name, val in urlparse.parse_qsl(parsed.query)
-                  if name not in OMIT_URL_PARAMS]
-        url = urlparse.urlunparse(('https', 'm.facebook.com', parsed.path,
-                                   '', urllib.urlencode(params), ''))
-        content = post.prettify().replace('href="/', 'href="https://m.facebook.com/')
-        entry = ENTRY % {
-          'id': url,
-          'title': unicode(post.div.get_text(' '))[:100],
-          'content': content,
-        }
-        parts.append(entry.encode('utf-8'))
+      # look for Full Story link; it's the first a element before More.
+      # (can't use text label because we don't know language.)
+      more = post.find(href=re.compile('/nfx/basic/direct_actions/.+'))
+      if not more:
+        continue
+      link = more.find_previous_sibling('a')
+      if not link:
+        continue
+
+      parsed = urlparse.urlparse(link['href'])
+      params = [(name, val) for name, val in urlparse.parse_qsl(parsed.query)
+                if name not in OMIT_URL_PARAMS]
+      url = urlparse.urlunparse(('https', 'm.facebook.com', parsed.path,
+                                 '', urllib.urlencode(params), ''))
+      content = post.prettify().replace('href="/', 'href="https://m.facebook.com/')
+      entry = ENTRY % {
+        'id': url,
+        'title': unicode(post.div.get_text(' '))[:100],
+        'content': content,
+      }
+      parts.append(entry.encode('utf-8'))
 
     parts += [FOOTER]
 
