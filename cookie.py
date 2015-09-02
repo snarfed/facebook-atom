@@ -7,6 +7,7 @@ import re
 import urllib
 import urllib2
 import urlparse
+import xml.sax.saxutils
 
 import appengine_config
 from bs4 import BeautifulSoup
@@ -72,7 +73,7 @@ class CookieHandler(webapp2.RequestHandler):
     else:
       logging.warning("Couldn't determine username or id!")
 
-    parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T')}]
+    parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T') + 'Z"}]
     for post in soup.find_all(id=re.compile('u_0_.')):
       # look for Full Story link; it's the first a element before More.
       # (can't use text label because we don't know language.)
@@ -90,7 +91,7 @@ class CookieHandler(webapp2.RequestHandler):
                                  '', urllib.urlencode(params), ''))
       content = post.prettify().replace('href="/', 'href="https://m.facebook.com/')
       entry = ENTRY % {
-        'id': url,
+        'id': xml.sax.saxutils.escape(url),
         'title': unicode(post.div.get_text(' '))[:100],
         'content': content,
       }
