@@ -30,7 +30,8 @@ FOOTER = """
 """
 ENTRY = u"""
 <entry>
-  <id>%(id)s</id>
+  <id>%(url)s</id>
+  <link rel="alternate" type="text/html" href="%(url)s" />
   <title>%(title)s</title>
   <content type="xhtml">
   <div xmlns="http://www.w3.org/1999/xhtml">
@@ -91,7 +92,7 @@ class CookieHandler(webapp2.RequestHandler):
                                  '', urllib.urlencode(params), ''))
       content = post.prettify().replace('href="/', 'href="https://m.facebook.com/')
       entry = ENTRY % {
-        'id': xml.sax.saxutils.escape(url),
+        'url': xml.sax.saxutils.escape(url),
         'title': unicode(post.div.get_text(' '))[:100],
         'content': content,
       }
