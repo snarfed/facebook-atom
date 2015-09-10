@@ -73,7 +73,7 @@ class CookieHandler(webapp2.RequestHandler):
     else:
       logging.warning("Couldn't determine username or id!")
 
-    parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T') + 'Z"}]
+    parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T') + 'Z'}]
     for post in soup.find_all(id=re.compile('u_0_.')):
       # look for Full Story link; it's the first a element before More.
       # (can't use text label because we don't know language.)
