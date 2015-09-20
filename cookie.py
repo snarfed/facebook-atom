@@ -42,6 +42,17 @@ ENTRY = u"""
 """
 OMIT_URL_PARAMS = {'bacr', '_ft_', 'refid'}
 
+# don't show stories with titles that contain one of these regexps.
+#
+# the double spaces are intentional. it's how FB renders these stories. should
+# help prevent false positives.
+TITLE_BLACKLIST = frozenset([
+  re.compile(r'  (commented on|liked) (this|a )'),
+  re.compile(r'  (was (mentioned|tagged) in( a)?|with|>)  '),
+  re.compile(r'  are now friends  '),
+  re.compile(r"  (wrote on|shared a  .+  to)  .+ 's (wall|timeline)", re.I),
+  re.compile(r' Add Friend$', re.I),
+])
 
 class CookieHandler(webapp2.RequestHandler):
 
@@ -81,8 +92,19 @@ class CookieHandler(webapp2.RequestHandler):
       more = post.find(href=re.compile('/nfx/basic/direct_actions/.+'))
       if not more:
         continue
+
       link = more.find_previous_sibling('a')
       if not link:
+        continue
+
+      story = unicode(post.div.get_text(' '))
+      blacklisted = False
+      for regex in TITLE_BLACKLIST:
+        if regex.search(story):
+          blacklisted = True
+          break
+
+      if blacklisted:
         continue
 
       parsed = urlparse.urlparse(link['href'])
@@ -93,7 +115,7 @@ class CookieHandler(webapp2.RequestHandler):
       content = post.prettify().replace('href="/', 'href="https://m.facebook.com/')
       entry = ENTRY % {
         'url': xml.sax.saxutils.escape(url),
-        'title': unicode(post.div.get_text(' '))[:100],
+        'title': story[:100],
         'content': content,
       }
       parts.append(entry.encode('utf-8'))
