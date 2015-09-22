@@ -21,7 +21,7 @@ HEADER = """\
 <logo>https://static.xx.fbcdn.net/rsrc.php/v2/yp/r/eZuLK-TGwK1.png</logo>
 <updated>%(updated)s</updated>
 
-<link href="https://m.facebook.com/" rel="alternate" type="text/html" />
+<link href="https://m.facebook.com/?sk=h_chr" rel="alternate" type="text/html" />
 <link href="https://facebook-atom.appspot.com/"
       rel="self" type="application/atom+xml" />
 """
@@ -63,7 +63,7 @@ class CookieHandler(webapp2.RequestHandler):
 
     logging.info('Fetching with Cookie: %s', cookie)
     resp = urllib2.urlopen(urllib2.Request(
-      'https://m.facebook.com/',
+      'https://m.facebook.com/?sk=h_chr',
       headers={
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
         'Cookie': cookie,
