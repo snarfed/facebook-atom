@@ -119,12 +119,20 @@ class CookieHandler(webapp2.RequestHandler):
         if header and blacklisted(header.get_text(' '), HEADER_BLACKLIST):
           continue
 
+      # strip footer with like count, comment count, etc., and also footer
+      # section with relative publish time (e.g. '1 hr'). they change over time,
+      # which we think triggers readers to show stories again even when you've
+      # already read them. https://github.com/snarfed/facebook-atom/issues/11
+      more.parent.previous_sibling.find('abbr').extract()
+      more.parent.extract()
+
       parsed = urlparse.urlparse(link['href'])
       params = [(name, val) for name, val in urlparse.parse_qsl(parsed.query)
                 if name not in OMIT_URL_PARAMS]
       url = urlparse.urlunparse(('https', 'm.facebook.com', parsed.path,
                                  '', urllib.urlencode(params), ''))
       content = post.prettify().replace('href="/', 'href="https://m.facebook.com/')
+
       entry = ENTRY % {
         'url': xml.sax.saxutils.escape(url),
         'title': story[:100],
