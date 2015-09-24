@@ -53,6 +53,19 @@ TITLE_BLACKLIST = frozenset([
   re.compile(r' Add Friend$', re.I),
 ])
 
+# don't show stories with headers that contain one of these regexps.
+HEADER_BLACKLIST = frozenset([
+  re.compile(r'  (liked|commented on) this\.$'),
+])
+
+
+def blacklisted(string, blacklist):
+  for regex in blacklist:
+    if regex.search(string):
+      return True
+
+
+
 class CookieHandler(webapp2.RequestHandler):
 
   def get(self):
@@ -97,14 +110,14 @@ class CookieHandler(webapp2.RequestHandler):
         continue
 
       story = unicode(post.div.get_text(' '))
-      blacklisted = False
-      for regex in TITLE_BLACKLIST:
-        if regex.search(story):
-          blacklisted = True
-          break
-
-      if blacklisted:
+      if blacklisted(story, TITLE_BLACKLIST):
         continue
+
+      header_div = post.find_previous_sibling('div')
+      if header_div:
+        header = header_div.find('h3')
+        if header and blacklisted(header.get_text(' '), HEADER_BLACKLIST):
+          continue
 
       parsed = urlparse.urlparse(link['href'])
       params = [(name, val) for name, val in urlparse.parse_qsl(parsed.query)
