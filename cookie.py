@@ -123,7 +123,6 @@ class CookieHandler(webapp2.RequestHandler):
       # section with relative publish time (e.g. '1 hr'). they change over time,
       # which we think triggers readers to show stories again even when you've
       # already read them. https://github.com/snarfed/facebook-atom/issues/11
-      more.parent.previous_sibling.find('abbr').extract()
       more.parent.extract()
 
       parsed = urlparse.urlparse(link['href'])
