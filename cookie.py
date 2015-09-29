@@ -42,28 +42,22 @@ ENTRY = u"""
 """
 OMIT_URL_PARAMS = {'bacr', '_ft_', 'refid'}
 
-# don't show stories with titles that contain one of these regexps.
+# don't show stories with titles or headers that contain one of these regexps.
 #
 # the double spaces are intentional. it's how FB renders these stories. should
 # help prevent false positives.
-TITLE_BLACKLIST = frozenset([
+BLACKLIST = frozenset([
   re.compile(r'  (are now friends|commented on|like[ds]|replied to)(  | this| a)'),
   re.compile(r'  (was (mentioned|tagged) in( a)?|with|>)  '),
   re.compile(r"  (wrote on|shared a  .+  to)  .+ 's (wall|timeline)", re.I),
   re.compile(r' Add Friend$', re.I),
 ])
 
-# don't show stories with headers that contain one of these regexps.
-HEADER_BLACKLIST = frozenset([
-  re.compile(r'  (liked|commented on) this\.$'),
-])
 
-
-def blacklisted(string, blacklist):
-  for regex in blacklist:
+def blacklisted(string):
+  for regex in BLACKLIST:
     if regex.search(string):
       return True
-
 
 
 class CookieHandler(webapp2.RequestHandler):
@@ -110,13 +104,13 @@ class CookieHandler(webapp2.RequestHandler):
         continue
 
       story = unicode(post.div.get_text(' '))
-      if blacklisted(story, TITLE_BLACKLIST):
+      if blacklisted(story):
         continue
 
       header_div = post.find_previous_sibling('div')
       if header_div:
         header = header_div.find('h3')
-        if header and blacklisted(header.get_text(' '), HEADER_BLACKLIST):
+        if header and blacklisted(header.get_text(' ')):
           continue
 
       # strip footer with like count, comment count, etc., and also footer
