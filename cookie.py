@@ -57,6 +57,7 @@ BLACKLIST = frozenset([
 def blacklisted(string):
   for regex in BLACKLIST:
     if regex.search(string):
+      logging.info('Ignoring %r due to %r', string, regex.pattern)
       return True
 
 
