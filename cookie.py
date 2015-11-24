@@ -51,13 +51,15 @@ BLACKLIST = frozenset([
   re.compile(r'  (was (mentioned|tagged) in( a)?|>)  '),
   re.compile(r"  (wrote on|shared a  .+  to)  .+ 's (wall|timeline)", re.I),
   re.compile(r' Add Friend$', re.I),
+  re.compile(r'Suggested Post', re.I),
 ])
 
 
 def blacklisted(string):
+  logging.info('Examining %r', string)
   for regex in BLACKLIST:
     if regex.search(string):
-      logging.info('Ignoring %r due to %r', string, regex.pattern)
+      logging.info('Ignoring due to %r', regex.pattern)
       return True
 
 
