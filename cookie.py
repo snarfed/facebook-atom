@@ -40,8 +40,8 @@ ENTRY = u"""
   </content>
 </entry>
 """
-OMIT_URL_PARAMS = {'bacr', '_ft_', 'refid'}
-
+OMIT_URL_PARAMS = {'bacr', 'ext', '_ft_', 'hash', 'refid'}
+nn
 # don't show stories with titles or headers that contain one of these regexps.
 #
 # the double spaces are intentional. it's how FB renders these stories. should
@@ -96,13 +96,13 @@ class CookieHandler(webapp2.RequestHandler):
 
     parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T') + 'Z'}]
     for post in soup.find_all(id=re.compile('u_0_.')):
-      # look for Full Story link; it's the first a element before More.
+      # look for Full Story link; it's the first a element before Save.
       # (can't use text label because we don't know language.)
-      more = post.find(href=re.compile('/nfx/basic/direct_actions/.+'))
-      if not more:
+      save = post.find(href=re.compile('/save/story/.+'))
+      if not save:
         continue
 
-      link = more.find_previous_sibling('a')
+      link = save.find_previous_sibling('a')
       if not link:
         continue
 
@@ -120,9 +120,9 @@ class CookieHandler(webapp2.RequestHandler):
       # section with relative publish time (e.g. '1 hr'). they change over time,
       # which we think triggers readers to show stories again even when you've
       # already read them. https://github.com/snarfed/facebook-atom/issues/11
-      if more.parent.previous_sibling:
-        more.parent.previous_sibling.extract()
-      more.parent.extract()
+      if save.parent.previous_sibling:
+        save.parent.previous_sibling.extract()
+      save.parent.extract()
 
       parsed = urlparse.urlparse(link['href'])
       params = [(name, val) for name, val in urlparse.parse_qsl(parsed.query)
