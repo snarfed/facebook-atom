@@ -41,7 +41,7 @@ ENTRY = u"""
 </entry>
 """
 OMIT_URL_PARAMS = {'bacr', 'ext', '_ft_', 'hash', 'refid'}
-nn
+
 # don't show stories with titles or headers that contain one of these regexps.
 #
 # the double spaces are intentional. it's how FB renders these stories. should
