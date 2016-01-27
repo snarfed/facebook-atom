@@ -83,6 +83,7 @@ class CookieHandler(webapp2.RequestHandler):
     assert resp.getcode() == 200
 
     soup = BeautifulSoup(body, 'html.parser')
+    # logging.debug(soup.prettify().encode('utf-8'))
     if not soup.find('a', href=re.compile('^/logout.php')):
       return self.abort(401, "Couldn't log into Facebook with cookie %s" % cookie)
 
@@ -94,16 +95,21 @@ class CookieHandler(webapp2.RequestHandler):
     else:
       logging.warning("Couldn't determine username or id!")
 
-    parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T') + 'Z'}]
-    for post in soup.find_all(id=re.compile('u_0_.')):
+    posts = soup.find_all(id=re.compile('u_0_.'))
+    logging.info('Found %d posts', len(posts))
+
+    atom_parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T') + 'Z'}]
+    for post in posts:
       # look for Full Story link; it's the first a element before Save.
       # (can't use text label because we don't know language.)
       save = post.find(href=re.compile('/save/story/.+'))
       if not save:
+        logging.info('Skipping one due to missing Save link')
         continue
 
       link = save.find_previous_sibling('a')
       if not link:
+        logging.info('Skipping one due to missing Full Story link')
         continue
 
       story = unicode(post.div.get_text(' '))
@@ -136,12 +142,12 @@ class CookieHandler(webapp2.RequestHandler):
         'title': story[:100],
         'content': content,
       }
-      parts.append(entry.encode('utf-8'))
+      atom_parts.append(entry.encode('utf-8'))
 
-    parts += [FOOTER]
+    atom_parts += [FOOTER]
 
     self.response.headers['Content-Type'] = 'application/atom+xml'
-    self.response.out.write(''.join(parts))
+    self.response.out.write(''.join(atom_parts))
 
 
 application = webapp2.WSGIApplication(
