@@ -95,19 +95,20 @@ class CookieHandler(webapp2.RequestHandler):
     else:
       logging.warning("Couldn't determine username or id!")
 
-    posts = soup.find_all(id=re.compile('u_0_.'))
+    posts = soup.find_all('div', id=re.compile('u_0_.'))
     logging.info('Found %d posts', len(posts))
 
     atom_parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T') + 'Z'}]
     for post in posts:
-      # look for Full Story link; it's the first a element before Save.
-      # (can't use text label because we don't know language.)
-      save = post.find(href=re.compile('/save/story/.+'))
-      if not save:
-        logging.info('Skipping one due to missing Save link')
+      # look for Full Story link; it's the first a element before Save or More.
+      # (can't use text labels because we don't know language.)
+      save_or_more = post.find(href=re.compile(
+        '/(save/story|nfx/basic/direct_actions)/.+'))
+      if not save_or_more:
+        logging.info('Skipping one due to missing Save and More links')
         continue
 
-      link = save.find_previous_sibling('a')
+      link = save_or_more.find_previous_sibling('a')
       if not link:
         logging.info('Skipping one due to missing Full Story link')
         continue
@@ -126,9 +127,9 @@ class CookieHandler(webapp2.RequestHandler):
       # section with relative publish time (e.g. '1 hr'). they change over time,
       # which we think triggers readers to show stories again even when you've
       # already read them. https://github.com/snarfed/facebook-atom/issues/11
-      if save.parent.previous_sibling:
-        save.parent.previous_sibling.extract()
-      save.parent.extract()
+      if save_or_more.parent.previous_sibling:
+        save_or_more.parent.previous_sibling.extract()
+      save_or_more.parent.extract()
 
       parsed = urlparse.urlparse(link['href'])
       params = [(name, val) for name, val in urlparse.parse_qsl(parsed.query)
