@@ -73,6 +73,7 @@ class CookieHandler(webapp2.RequestHandler):
 
     logging.info('Fetching with Cookie: %s', cookie)
     resp = urllib2.urlopen(urllib2.Request(
+      # ?sk=hcr uses the Most Recent news feed option (instead of Top Stories)
       'https://m.facebook.com/?sk=h_chr',
       headers={
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
