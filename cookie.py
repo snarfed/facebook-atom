@@ -11,11 +11,14 @@ import xml.sax.saxutils
 
 import appengine_config
 from bs4 import BeautifulSoup
+from oauth_dropins.webutil import handlers
 import webapp2
 
 HEADER = """\
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom">
+<feed xml:lang="en-US"
+      xmlns="http://www.w3.org/2005/Atom"
+      xml:base="https://m.facebook.com/">
 <id>https://facebook-atom.appspot.com/</id>
 <title>facebook-atom feed</title>
 <logo>https://static.xx.fbcdn.net/rsrc.php/v2/yp/r/eZuLK-TGwK1.png</logo>
@@ -64,6 +67,7 @@ def blacklisted(string):
 
 
 class CookieHandler(webapp2.RequestHandler):
+  handle_exception = handlers.handle_exception
 
   def get(self):
     try:
