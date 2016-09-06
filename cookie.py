@@ -71,7 +71,8 @@ def clean_url(url):
   if parsed.netloc not in ('', 'm.facebook.com'):
     return url
 
-  params = [(name, val) for name, val in urlparse.parse_qsl(parsed.query)
+  params = [(name, val.encode('utf-8'))
+            for name, val in urlparse.parse_qsl(parsed.query)
             if name not in OMIT_URL_PARAMS]
   return urlparse.urlunparse(('https', 'm.facebook.com', parsed.path,
                               '', urllib.urlencode(params), ''))
