@@ -66,6 +66,17 @@ def blacklisted(string):
       return True
 
 
+def clean_url(url):
+  parsed = urlparse.urlparse(url)
+  if parsed.netloc not in ('', 'm.facebook.com'):
+    return url
+
+  params = [(name, val) for name, val in urlparse.parse_qsl(parsed.query)
+            if name not in OMIT_URL_PARAMS]
+  return urlparse.urlunparse(('https', 'm.facebook.com', parsed.path,
+                              '', urllib.urlencode(params), ''))
+
+
 class CookieHandler(handlers.ModernHandler):
   handle_exception = handlers.handle_exception
 
@@ -136,17 +147,14 @@ class CookieHandler(handlers.ModernHandler):
         save_or_more.parent.previous_sibling.extract()
       save_or_more.parent.extract()
 
-      parsed = urlparse.urlparse(link['href'])
-      params = [(name, val) for name, val in urlparse.parse_qsl(parsed.query)
-                if name not in OMIT_URL_PARAMS]
-      url = urlparse.urlunparse(('https', 'm.facebook.com', parsed.path,
-                                 '', urllib.urlencode(params), ''))
-      content = post.prettify().replace('href="/', 'href="https://m.facebook.com/')
+      for a in post.find_all('a'):
+        if a.get('href'):
+          a['href'] = clean_url(a['href'])
 
       entry = ENTRY % {
-        'url': xml.sax.saxutils.escape(url),
+        'url': xml.sax.saxutils.escape(clean_url(link['href'])),
         'title': story[:100],
-        'content': content,
+        'content': post.prettify(),
       }
       atom_parts.append(entry.encode('utf-8'))
 
