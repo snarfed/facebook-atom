@@ -93,7 +93,7 @@ class CookieHandler(handlers.ModernHandler):
       'https://m.facebook.com/?sk=h_chr',
       headers={
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
-        'Cookie': cookie,
+        'Cookie': cookie.encode('utf-8'),
       }))
     body = resp.read()
     logging.info('Response: %s', resp.getcode())
