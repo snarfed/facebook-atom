@@ -68,11 +68,17 @@ def blacklisted(string):
 
 def clean_url(url):
   parsed = urlparse.urlparse(url)
-  if parsed.netloc not in ('', 'm.facebook.com'):
+  if parsed.netloc not in ('', 'm.facebook.com', 'lm.facebook.com'):
     return url
 
+  query = urlparse.parse_qsl(parsed.query)
+  if parsed.path == '/l.php':
+    for name, val in query:
+      if name == 'u':
+        return urllib.unquote(val)
+
   params = [(name, val.encode('utf-8'))
-            for name, val in urlparse.parse_qsl(parsed.query)
+            for name, val in query
             if name not in OMIT_URL_PARAMS]
   return urlparse.urlunparse(('https', 'm.facebook.com', parsed.path,
                               '', urllib.urlencode(params), ''))
