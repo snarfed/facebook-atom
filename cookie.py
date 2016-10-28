@@ -158,6 +158,11 @@ class CookieHandler(handlers.ModernHandler):
         if a.get('href'):
           a['href'] = clean_url(a['href'])
 
+      # strip all id and class attributes
+      for elem in post.find_all() + [post]:
+        del elem['id']
+        del elem['class']
+
       entry = ENTRY % {
         'url': xml.sax.saxutils.escape(clean_url(link['href'])),
         'title': story[:100],
