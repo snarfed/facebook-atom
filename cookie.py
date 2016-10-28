@@ -50,7 +50,7 @@ OMIT_URL_PARAMS = {'bacr', 'ext', '_ft_', 'hash', 'refid'}
 # the double spaces are intentional. it's how FB renders these stories. should
 # help prevent false positives.
 BLACKLIST = frozenset([
-  re.compile(r'  (are now friends|is now friends with|(also )?commented on|like[ds]|reacted to|replied to|followed|is going to)(  ?| this| an?)'),
+  re.compile(r'  (are now friends|is now friends with|(also )?commented on|like([ds])?|reacted to|replied to|followed|is going to)(  ?| this| an?)'),
   re.compile(r'  ((was|were) (mentioned|tagged) in( an?)?|>)  '),
   re.compile(r"  (wrote on|shared a  .+  to)  .+ 's (wall|timeline)", re.I),
   re.compile(r' Add Friend$', re.I),
