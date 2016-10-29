@@ -3,6 +3,7 @@
 
 import datetime
 import logging
+import operator
 import re
 import urllib
 import urllib2
@@ -121,7 +122,7 @@ class CookieHandler(handlers.ModernHandler):
     posts = soup.find_all('div', id=re.compile('u_0_.'))
     logging.info('Found %d posts', len(posts))
 
-    atom_parts = [HEADER % {'updated': datetime.datetime.now().isoformat('T') + 'Z'}]
+    entries = []
     for post in posts:
       # look for Full Story link; it's the first a element before Save or More.
       # (can't use text labels because we don't know language.)
@@ -139,6 +140,11 @@ class CookieHandler(handlers.ModernHandler):
       story = unicode(post.div.get_text(' '))
       if blacklisted(story):
         continue
+
+      # temporary, debugging ads
+      if 'Upworthy' in story or 'Gizmodo' in story or 'Lifehacker' in story:
+        logging.debug('Ad!')
+        logging.debug(post.prettify().encode('utf-8'))
 
       header_div = post.find_previous_sibling('div')
       if header_div:
@@ -163,17 +169,21 @@ class CookieHandler(handlers.ModernHandler):
         del elem['id']
         del elem['class']
 
-      entry = ENTRY % {
+      entries.append({
         'url': xml.sax.saxutils.escape(clean_url(link['href'])),
         'title': story[:100],
         'content': post.prettify(),
-      }
-      atom_parts.append(entry.encode('utf-8'))
+      })
 
-    atom_parts += [FOOTER]
+    entries.sort(key=operator.itemgetter('url'), reverse=True)
 
     self.response.headers['Content-Type'] = 'application/atom+xml'
-    self.response.out.write(''.join(atom_parts))
+
+    self.response.out.write(
+      HEADER % {'updated': datetime.datetime.now().isoformat('T') + 'Z'})
+    for entry in entries:
+      self.response.out.write((ENTRY % entry).encode('utf-8'))
+    self.response.out.write(FOOTER)
 
 
 application = webapp2.WSGIApplication(
