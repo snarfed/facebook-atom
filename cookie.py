@@ -142,9 +142,9 @@ class CookieHandler(handlers.ModernHandler):
         continue
 
       # temporary, debugging ads
-      if 'Upworthy' in story or 'Gizmodo' in story or 'Lifehacker' in story:
-        logging.debug('Ad!')
-        logging.debug(post.prettify().encode('utf-8'))
+      # if 'Upworthy' in story or 'Gizmodo' in story or 'Lifehacker' in story:
+      #   logging.debug('Ad!')
+      #   logging.debug(post.prettify().encode('utf-8'))
 
       header_div = post.find_previous_sibling('div')
       if header_div:

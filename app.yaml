@@ -43,13 +43,6 @@ handlers:
     X-Frame-Options: "SAMEORIGIN"
     X-XSS-Protection: "1; mode=block"
 
-- url: /atom
-  # App Engine automatically serves this with Content-Type: application/atom+xml
-  # due to the file extension.
-  static_files: static/warning.atom
-  upload: static/warning.atom
-  secure: always
-
 - url: /cookie
   script: cookie.application
   secure: always
