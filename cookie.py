@@ -45,6 +45,7 @@ ENTRY = u"""
 </entry>
 """
 OMIT_URL_PARAMS = {'bacr', 'ext', '_ft_', 'hash', 'refid'}
+CACHE_EXPIRATION = datetime.timedelta(minutes=5)
 
 # don't show stories with titles or headers that contain one of these regexps.
 #
@@ -88,6 +89,7 @@ def clean_url(url):
 class CookieHandler(handlers.ModernHandler):
   handle_exception = handlers.handle_exception
 
+  @handlers.memcache_response(CACHE_EXPIRATION)
   def get(self):
     try:
       cookie = 'c_user=%(c_user)s; xs=%(xs)s' % self.request.params
