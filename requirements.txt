@@ -1,2 +1,2 @@
 beautifulsoup4
-granary
+-e git+https://github.com/snarfed/granary.git#egg=granary
