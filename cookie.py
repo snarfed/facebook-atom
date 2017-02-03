@@ -45,6 +45,7 @@ ENTRY = u"""
 </entry>
 """
 OMIT_URL_PARAMS = {'bacr', 'ext', '_ft_', 'hash', 'refid'}
+OMIT_ATTRIBUTES = {'id', 'class', 'data-ft'}
 CACHE_EXPIRATION = datetime.timedelta(minutes=5)
 
 # don't show stories with titles or headers that contain one of these regexps.
@@ -143,11 +144,6 @@ class CookieHandler(handlers.ModernHandler):
       if blacklisted(story):
         continue
 
-      # temporary, debugging ads
-      # if 'Upworthy' in story or 'Gizmodo' in story or 'Lifehacker' in story:
-      #   logging.debug('Ad!')
-      #   logging.debug(post.prettify().encode('utf-8'))
-
       header_div = post.find_previous_sibling('div')
       if header_div:
         header = header_div.find('h3')
@@ -166,10 +162,9 @@ class CookieHandler(handlers.ModernHandler):
         if a.get('href'):
           a['href'] = clean_url(a['href'])
 
-      # strip all id and class attributes
       for elem in post.find_all() + [post]:
-        del elem['id']
-        del elem['class']
+        for attr in OMIT_ATTRIBUTES:
+          del elem[attr]
 
       entries.append({
         'url': xml.sax.saxutils.escape(clean_url(link['href'])),
