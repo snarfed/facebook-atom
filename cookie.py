@@ -74,16 +74,20 @@ def clean_url(url):
   if parsed.netloc not in ('', 'm.facebook.com', 'lm.facebook.com'):
     return url
 
+  path = parsed.path
   query = urlparse.parse_qsl(parsed.query)
   if parsed.path == '/l.php':
     for name, val in query:
       if name == 'u':
         return urllib.unquote(val)
 
+  if path == '/story.php':
+    path = '/permalink.php'
+
   params = [(name, val.encode('utf-8'))
             for name, val in query
             if name not in OMIT_URL_PARAMS]
-  return urlparse.urlunparse(('https', 'm.facebook.com', parsed.path,
+  return urlparse.urlunparse(('https', 'www.facebook.com', path,
                               '', urllib.urlencode(params), ''))
 
 
