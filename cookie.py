@@ -45,7 +45,7 @@ ENTRY = u"""
 </entry>
 """
 OMIT_URL_PARAMS = {'bacr', 'ext', '_ft_', 'hash', 'refid'}
-OMIT_ATTRIBUTES = {'id', 'class', 'data-ft'}
+OMIT_ATTRIBUTES = {'id', 'class', 'data-ft', 'role'}
 CACHE_EXPIRATION = datetime.timedelta(minutes=5)
 
 # don't show stories with titles or headers that contain one of these regexps.
