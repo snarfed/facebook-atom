@@ -154,12 +154,18 @@ class CookieHandler(handlers.ModernHandler):
         if header and blacklisted(header.get_text(' ')):
           continue
 
-      # strip footer with like count, comment count, etc., and also footer
-      # section with relative publish time (e.g. '1 hr'). they change over time,
-      # which we think triggers readers to show stories again even when you've
-      # already read them. https://github.com/snarfed/facebook-atom/issues/11
+      # strip footer sections:
+      # * save_or_more.parent: like count, comment count, etc.
+      # * ...previous_sibling: relative publish time (e.g. '1 hr')
+      # * ...next_sibling: most recent comment
+      #
+      # these all change over time, which we think triggers readers to show
+      # stories again even when you've already read them.
+      # https://github.com/snarfed/facebook-atom/issues/11
       if save_or_more.parent.previous_sibling:
         save_or_more.parent.previous_sibling.extract()
+      if save_or_more.parent.next_sibling:
+        save_or_more.parent.next_sibling.extract()
       save_or_more.parent.extract()
 
       for a in post.find_all('a'):
