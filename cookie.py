@@ -44,7 +44,7 @@ ENTRY = u"""
   </content>
 </entry>
 """
-OMIT_URL_PARAMS = {'bacr', 'ext', '_ft_', 'hash', 'refid'}
+OMIT_URL_PARAMS = {'bacr', 'ext', '_ft_', 'hash', 'refid', '_sref_', '_tn_'}
 OMIT_ATTRIBUTES = {'id', 'class', 'data-ft', 'role'}
 CACHE_EXPIRATION = datetime.timedelta(minutes=5)
 
