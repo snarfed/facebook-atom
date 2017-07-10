@@ -57,7 +57,7 @@ BLACKLIST = frozenset([
   re.compile(r'  ((was|were) (mentioned|tagged) in( an?)?|>)  '),
   re.compile(r"  (wrote on|shared a  .+  to)  .+ 's (wall|timeline)", re.I),
   re.compile(r' Add Friend$', re.I),
-  re.compile(r'Suggested Post', re.I),
+  re.compile(r'Suggested Post|A Video You May Like', re.I),
 ])
 
 
