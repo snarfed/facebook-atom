@@ -164,8 +164,11 @@ class CookieHandler(handlers.ModernHandler):
       # https://github.com/snarfed/facebook-atom/issues/11
       if save_or_more.parent.previous_sibling:
         save_or_more.parent.previous_sibling.extract()
-      if save_or_more.parent.next_sibling:
-        save_or_more.parent.next_sibling.extract()
+      # this is a generator, so it's flaky (not sure why), so fully evaluate it
+      # with list() before using it.
+      nexts = list(save_or_more.parent.next_siblings)
+      for next in nexts:
+        next.extract()
       save_or_more.parent.extract()
 
       for a in post.find_all('a'):
