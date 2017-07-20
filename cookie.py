@@ -44,8 +44,23 @@ ENTRY = u"""
   </content>
 </entry>
 """
-OMIT_URL_PARAMS = {'bacr', 'ext', '_ft_', 'hash', 'refid', '_sref_', '_tn_'}
-OMIT_ATTRIBUTES = {'id', 'class', 'data-ft', 'role'}
+OMIT_URL_PARAMS = {
+  '_ft_',
+  '_sref_',
+  '_tn_',
+  '__tn__',
+  'bacr',
+  'ext',
+  'fref',
+  'hash',
+  'refid',
+}
+OMIT_ATTRIBUTES = {
+  'class',
+  'data-ft',
+  'id',
+  'role',
+}
 CACHE_EXPIRATION = datetime.timedelta(minutes=5)
 
 # don't show stories with titles or headers that contain one of these regexps.
@@ -71,7 +86,8 @@ def blacklisted(string):
 
 def clean_url(url):
   parsed = urlparse.urlparse(url)
-  if parsed.netloc not in ('', 'm.facebook.com', 'lm.facebook.com'):
+  if parsed.netloc not in ('', 'm.facebook.com', 'lm.facebook.com',
+                           'www.facebook.com'):
     return url
 
   path = parsed.path
