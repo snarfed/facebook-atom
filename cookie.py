@@ -56,6 +56,7 @@ OMIT_URL_PARAMS = {
   'refid',
 }
 OMIT_ATTRIBUTES = {
+  'alt',
   'class',
   'data-ft',
   'id',
