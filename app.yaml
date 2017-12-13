@@ -50,7 +50,7 @@ handlers:
   secure: always
 
 skip_files:
-- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*\.(c|cc|cpp|h|o|py[co]|so)$
 - ^(.*/)?.*/RCS/.*
 - ^(.*/)?\..*
 - ^(.*/)?.*\.bak$
