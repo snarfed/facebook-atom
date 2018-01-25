@@ -12,6 +12,7 @@ import xml.sax.saxutils
 
 import appengine_config
 from bs4 import BeautifulSoup
+from granary import atom
 from oauth_dropins.webutil import handlers
 import webapp2
 
@@ -128,12 +129,24 @@ class CookieHandler(handlers.ModernHandler):
       }))
     body = resp.read()
     logging.info('Response: %s', resp.getcode())
-    assert resp.getcode() == 200
+    # logging.debug(soup.prettify().encode('utf-8'))
 
     soup = BeautifulSoup(body, 'html.parser')
-    # logging.debug(soup.prettify().encode('utf-8'))
-    if not soup.find('a', href=re.compile('^/logout.php')):
-      return self.abort(401, "Couldn't log into Facebook with cookie %s" % cookie)
+    if (resp.getcode() in (401, 403) or
+        not soup.find('a', href=re.compile('^/logout.php'))):
+      self.response.headers['Content-Type'] = 'application/atom+xml'
+      host_url = self.request.host_url + '/'
+      self.response.out.write(atom.activities_to_atom([{
+        'object': {
+          'url': self.request.url,
+          'content': 'Your facebook-atom cookie isn\'t working. <a href="%s">Click here to regenerate your feed!</a>' % host_url,
+          },
+        }], {}, title='facebook-atom', host_url=host_url,
+        request_url=self.request.path_url))
+      return
+    elif resp.getcode() != 200:
+      return self.abort(502, "Facebook fetch failed")
+
 
     home_link = soup.find('a', href=re.compile(
       r'/[^?]+\?ref_component=mbasic_home_bookmark.*'))
