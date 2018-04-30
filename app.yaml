@@ -7,13 +7,13 @@ threadsafe: true
 api_version: 1
 default_expiration: 1d
 
+includes:
+  - local/lib/python2.7/site-packages/oauth_dropins/webutil/app.common.yaml
+
 # background: https://github.com/snarfed/bridgy/issues/578
 automatic_scaling:
   max_idle_instances: 1
   max_concurrent_requests: 12
-
-builtins:
-- remote_api: on
 
 libraries:
 - name: lxml
@@ -48,11 +48,3 @@ handlers:
 - url: /cookie
   script: cookie.application
   secure: always
-
-skip_files:
-- ^(.*/)?.*\.(c|cc|cpp|h|o|py[co]|so)$
-- ^(.*/)?.*/RCS/.*
-- ^(.*/)?\..*
-- ^(.*/)?.*\.bak$
-- ^(.*/)?(debian|docs?|examples?|l|pydocs?|python3|ref|samples?|tests?)/.*
-- ^local/lib/python2.7/site-packages/setuptools/script\ \(dev\)\.tmpl$
