@@ -73,6 +73,7 @@ BLACKLIST = frozenset([
   re.compile(r'  (are now friends|is now friends with|(also )?commented on|added \d+ comments on|[Ll]ike([ds])?|reacted to|replied to|followed|is going to|is interested in)(  ?| this| an?)'),
   re.compile(r'  ((was|were) (mentioned|tagged) in( an?)?|>)  '),
   re.compile(r"  (wrote on|shared a  .+  to)  .+ 's (wall|timeline)", re.I),
+  re.compile(r'Popular Across Facebook', re.I),
   re.compile(r' Add Friend$', re.I),
   re.compile(r'Suggested Post|A Video You May Like', re.I),
 ])
