@@ -70,12 +70,11 @@ CACHE_EXPIRATION = datetime.timedelta(minutes=5)
 # the double spaces are intentional. it's how FB renders these stories. should
 # help prevent false positives.
 BLACKLIST = frozenset([
-  re.compile(r'  (are now friends|is now friends with|(also )?commented on|added \d+ comments on|[Ll]ike([ds])?|reacted to|replied to|followed|is going to|is interested in)(  ?| this| an?)'),
+  re.compile(r'  (are now friends|is now friends with|(also )?commented on|added \d+ comments on|[Ll]ike([ds])?|reacted to|replied to|followed|is going to|is interested in|donated to)(  ?| this| an?)'),
   re.compile(r'  ((was|were) (mentioned|tagged) in( an?)?|>)  '),
   re.compile(r"  (wrote on|shared a  .+  to)  .+ 's (wall|timeline)", re.I),
-  re.compile(r'Popular Across Facebook', re.I),
   re.compile(r' Add Friend$', re.I),
-  re.compile(r'Suggested Post|A Video You May Like', re.I),
+  re.compile(r"A Video You May Like|Popular Across Facebook|Similar to Posts You've Interacted With|Suggested Post", re.I),
 ])
 
 
