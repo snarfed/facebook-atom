@@ -12,6 +12,7 @@ import xml.sax.saxutils
 
 import appengine_config
 from bs4 import BeautifulSoup
+from granary import atom
 from oauth_dropins.webutil import handlers
 import webapp2
 
@@ -44,8 +45,24 @@ ENTRY = u"""
   </content>
 </entry>
 """
-OMIT_URL_PARAMS = {'bacr', 'ext', '_ft_', 'hash', 'refid'}
-OMIT_ATTRIBUTES = {'id', 'class', 'data-ft'}
+OMIT_URL_PARAMS = {
+  '_ft_',
+  '_sref_',
+  '_tn_',
+  '__tn__',
+  'bacr',
+  'ext',
+  'fref',
+  'hash',
+  'refid',
+}
+OMIT_ATTRIBUTES = {
+  'alt',
+  'class',
+  'data-ft',
+  'id',
+  'role',
+}
 CACHE_EXPIRATION = datetime.timedelta(minutes=5)
 
 # don't show stories with titles or headers that contain one of these regexps.
@@ -53,11 +70,11 @@ CACHE_EXPIRATION = datetime.timedelta(minutes=5)
 # the double spaces are intentional. it's how FB renders these stories. should
 # help prevent false positives.
 BLACKLIST = frozenset([
-  re.compile(r'  (are now friends|is now friends with|(also )?commented on|like([ds])?|reacted to|replied to|followed|is going to)(  ?| this| an?)'),
+  re.compile(r'  (are now friends|is now friends with|(also )?commented on|added \d+ comments on|[Ll]ike([ds])?|reacted to|replied to|followed|is going to|is interested in|donated to)(  ?| this| an?)'),
   re.compile(r'  ((was|were) (mentioned|tagged) in( an?)?|>)  '),
   re.compile(r"  (wrote on|shared a  .+  to)  .+ 's (wall|timeline)", re.I),
   re.compile(r' Add Friend$', re.I),
-  re.compile(r'Suggested Post', re.I),
+  re.compile(r"A Video You May Like|Popular Across Facebook|Similar to Posts You've Interacted With|Suggested Post", re.I),
 ])
 
 
@@ -71,7 +88,8 @@ def blacklisted(string):
 
 def clean_url(url):
   parsed = urlparse.urlparse(url)
-  if parsed.netloc not in ('', 'm.facebook.com', 'lm.facebook.com'):
+  if parsed.netloc not in ('', 'm.facebook.com', 'lm.facebook.com',
+                           'www.facebook.com'):
     return url
 
   path = parsed.path
@@ -111,12 +129,24 @@ class CookieHandler(handlers.ModernHandler):
       }))
     body = resp.read()
     logging.info('Response: %s', resp.getcode())
-    assert resp.getcode() == 200
+    # logging.debug(soup.prettify().encode('utf-8'))
 
     soup = BeautifulSoup(body, 'html.parser')
-    # logging.debug(soup.prettify().encode('utf-8'))
-    if not soup.find('a', href=re.compile('^/logout.php')):
-      return self.abort(401, "Couldn't log into Facebook with cookie %s" % cookie)
+    if (resp.getcode() in (401, 403) or
+        not soup.find('a', href=re.compile('^/logout.php'))):
+      self.response.headers['Content-Type'] = 'application/atom+xml'
+      host_url = self.request.host_url + '/'
+      self.response.out.write(atom.activities_to_atom([{
+        'object': {
+          'url': self.request.url,
+          'content': 'Your facebook-atom cookie isn\'t working. <a href="%s">Click here to regenerate your feed!</a>' % host_url,
+          },
+        }], {}, title='facebook-atom', host_url=host_url,
+        request_url=self.request.path_url))
+      return
+    elif resp.getcode() != 200:
+      return self.abort(502, "Facebook fetch failed")
+
 
     home_link = soup.find('a', href=re.compile(
       r'/[^?]+\?ref_component=mbasic_home_bookmark.*'))
@@ -154,12 +184,21 @@ class CookieHandler(handlers.ModernHandler):
         if header and blacklisted(header.get_text(' ')):
           continue
 
-      # strip footer with like count, comment count, etc., and also footer
-      # section with relative publish time (e.g. '1 hr'). they change over time,
-      # which we think triggers readers to show stories again even when you've
-      # already read them. https://github.com/snarfed/facebook-atom/issues/11
+      # strip footer sections:
+      # * save_or_more.parent: like count, comment count, etc.
+      # * ...previous_sibling: relative publish time (e.g. '1 hr')
+      # * ...next_sibling: most recent comment
+      #
+      # these all change over time, which we think triggers readers to show
+      # stories again even when you've already read them.
+      # https://github.com/snarfed/facebook-atom/issues/11
       if save_or_more.parent.previous_sibling:
         save_or_more.parent.previous_sibling.extract()
+      # this is a generator, so it's flaky (not sure why), so fully evaluate it
+      # with list() before using it.
+      nexts = list(save_or_more.parent.next_siblings)
+      for next in nexts:
+        next.extract()
       save_or_more.parent.extract()
 
       for a in post.find_all('a'):
