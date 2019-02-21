@@ -211,7 +211,7 @@ class CookieHandler(handlers.ModernHandler):
 
       entries.append({
         'url': xml.sax.saxutils.escape(clean_url(link['href'])),
-        'title': story[:100],
+        'title': xml.sax.saxutils.escape(story[:100]),
         'content': post.prettify(),
       })
 
