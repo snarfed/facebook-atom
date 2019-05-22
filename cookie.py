@@ -119,6 +119,10 @@ class CookieHandler(handlers.ModernHandler):
     except KeyError:
       return self.abort(400, 'Query parameters c_user and xs are required')
 
+    all = self.request.get('all', '').lower() == 'true'
+    if all:
+      logging.info('Ignoring blacklist and returning all items due to all=true!')
+
     logging.info('Fetching with Cookie: %s', cookie)
     resp = urllib2.urlopen(urllib2.Request(
       # ?sk=hcr uses the Most Recent news feed option (instead of Top Stories)
@@ -175,14 +179,14 @@ class CookieHandler(handlers.ModernHandler):
         continue
 
       story = unicode(post.div.get_text(' '))
-      if blacklisted(story):
-        continue
-
-      header_div = post.find_previous_sibling('div')
-      if header_div:
-        header = header_div.find('h3')
-        if header and blacklisted(header.get_text(' ')):
+      if not all:
+        if blacklisted(story):
           continue
+        header_div = post.find_previous_sibling('div')
+        if header_div:
+          header = header_div.find('h3')
+          if header and blacklisted(header.get_text(' ')):
+            continue
 
       # strip footer sections:
       # * save_or_more.parent: like count, comment count, etc.
