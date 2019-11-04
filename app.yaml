@@ -17,9 +17,15 @@ automatic_scaling:
   max_pending_latency: 100ms  # default is 30
 
 libraries:
+- name: jinja2
+  version: latest
 - name: lxml
   version: latest
 - name: ssl
+  version: latest
+- name: ujson
+  version: latest
+- name: webob
   version: latest
 
 handlers:
