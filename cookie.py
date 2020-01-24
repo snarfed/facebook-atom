@@ -129,11 +129,10 @@ class CookieHandler(handlers.ModernHandler):
       }))
     body = resp.read()
     logging.info('Response: %s', resp.getcode())
-    # logging.debug(soup.prettify().encode('utf-8'))
 
     soup = BeautifulSoup(body, 'html.parser')
-    if (resp.getcode() in (401, 403) or
-        not soup.find('a', href=re.compile('^/logout.php'))):
+    # logging.debug(soup.prettify().encode('utf-8'))
+    if resp.getcode() in (401, 403):
       self.response.headers['Content-Type'] = 'application/atom+xml'
       host_url = self.request.host_url + '/'
       self.response.out.write(atom.activities_to_atom([{
