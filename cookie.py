@@ -1,19 +1,15 @@
 """Fetch m.facebook.com with a cookie and convert it to Atom.
 """
-
 import datetime
 import logging
 import operator
 import re
-import urllib
-import urllib2
-import urlparse
+import urllib.parse
 import xml.sax.saxutils
 
-import appengine_config
 from bs4 import BeautifulSoup
 from granary import atom
-from oauth_dropins.webutil import handlers
+from oauth_dropins.webutil import appengine_config, appengine_info, handlers
 import webapp2
 
 HEADER = """\
@@ -87,17 +83,17 @@ def blacklisted(string):
 
 
 def clean_url(url):
-  parsed = urlparse.urlparse(url)
+  parsed = urllib.parse.urlparse(url)
   if parsed.netloc not in ('', 'm.facebook.com', 'lm.facebook.com',
                            'www.facebook.com'):
     return url
 
   path = parsed.path
-  query = urlparse.parse_qsl(parsed.query)
+  query = urllib.parse.parse_qsl(parsed.query)
   if parsed.path == '/l.php':
     for name, val in query:
       if name == 'u':
-        return urllib.unquote(val)
+        return urllib.parse.unquote(val)
 
   if path == '/story.php':
     path = '/permalink.php'
@@ -105,14 +101,14 @@ def clean_url(url):
   params = [(name, val.encode('utf-8'))
             for name, val in query
             if name not in OMIT_URL_PARAMS]
-  return urlparse.urlunparse(('https', 'www.facebook.com', path,
-                              '', urllib.urlencode(params), ''))
+  return urllib.parse.urlunparse(('https', 'www.facebook.com', path,
+                                  '', urllib.parse.urlencode(params), ''))
 
 
 class CookieHandler(handlers.ModernHandler):
   handle_exception = handlers.handle_exception
 
-  @handlers.memcache_response(CACHE_EXPIRATION)
+  @handlers.cache_response(CACHE_EXPIRATION)
   def get(self):
     try:
       cookie = 'c_user=%(c_user)s; xs=%(xs)s' % self.request.params
@@ -124,7 +120,7 @@ class CookieHandler(handlers.ModernHandler):
       logging.info('Ignoring blacklist and returning all items due to all=true!')
 
     logging.info('Fetching with Cookie: %s', cookie)
-    resp = urllib2.urlopen(urllib2.Request(
+    resp = urllib.request.urlopen(urllib.request.Request(
       # ?sk=hcr uses the Most Recent news feed option (instead of Top Stories)
       'https://m.facebook.com/?sk=h_chr',
       headers={
@@ -178,7 +174,7 @@ class CookieHandler(handlers.ModernHandler):
         logging.info('Skipping one due to missing Full Story link')
         continue
 
-      story = unicode(post.div.get_text(' '))
+      story = post.div.get_text(' ')
       if not all:
         if blacklisted(story):
           continue
@@ -230,6 +226,6 @@ class CookieHandler(handlers.ModernHandler):
     self.response.out.write(FOOTER)
 
 
-application = webapp2.WSGIApplication(
-  [('/cookie', CookieHandler),
-   ], debug=False)
+application = webapp2.WSGIApplication([
+  ('/cookie', CookieHandler),
+], debug=appengine_info.DEBUG)
