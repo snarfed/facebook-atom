@@ -155,7 +155,7 @@ class CookieHandler(handlers.ModernHandler):
     else:
       logging.warning("Couldn't determine username or id!")
 
-    posts = soup.find_all('div', id=re.compile('u_0_.'))
+    posts = soup.find_all('article', id=re.compile('u_0_.'))
     logging.info('Found %d posts', len(posts))
 
     entries = []
