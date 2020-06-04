@@ -59,13 +59,13 @@ OMIT_ATTRIBUTES = {
   'id',
   'role',
 }
-CACHE_EXPIRATION = datetime.timedelta(minutes=5)
+CACHE_EXPIRATION = datetime.timedelta(minutes=15)
 
 # don't show stories with titles or headers that contain one of these regexps.
 #
 # the double spaces are intentional. it's how FB renders these stories. should
 # help prevent false positives.
-BLACKLIST = frozenset([
+BLOCKLIST = frozenset([
   re.compile(r'  (are now friends|is now friends with|(also )?commented on|added \d+ comments on|[Ll]ike([ds])?|reacted to|replied to|followed|is going to|is interested in|donated to)(  ?| this| an?)'),
   re.compile(r'  ((was|were) (mentioned|tagged)( in( an?| this)?|>) )?'),
   re.compile(r"  (wrote on|shared a  .+  to)  .+ 's (wall|timeline)", re.I),
@@ -74,9 +74,9 @@ BLACKLIST = frozenset([
 ])
 
 
-def blacklisted(string):
+def blocklisted(string):
   logging.info('Examining %r', string)
-  for regex in BLACKLIST:
+  for regex in BLOCKLIST:
     if regex.search(string):
       logging.info('Ignoring due to %r', regex.pattern)
       return True
@@ -108,7 +108,8 @@ def clean_url(url):
 class CookieHandler(handlers.ModernHandler):
   handle_exception = handlers.handle_exception
 
-  @handlers.cache_response(CACHE_EXPIRATION)
+  # @handlers.cache_response(CACHE_EXPIRATION)
+  @handlers.throttle(CACHE_EXPIRATION)
   def get(self):
     try:
       cookie = 'c_user=%(c_user)s; xs=%(xs)s' % self.request.params
@@ -117,7 +118,7 @@ class CookieHandler(handlers.ModernHandler):
 
     all = self.request.get('all', '').lower() == 'true'
     if all:
-      logging.info('Ignoring blacklist and returning all items due to all=true!')
+      logging.info('Ignoring blocklist and returning all items due to all=true!')
 
     logging.info('Fetching with Cookie: %s', cookie)
     resp = urllib.request.urlopen(urllib.request.Request(
@@ -173,14 +174,15 @@ class CookieHandler(handlers.ModernHandler):
         logging.info('Skipping one due to missing Full Story link')
         continue
 
-      story = post.div.get_text(' ')
+      story = post.div.get_text(' ') or post.h3.get_text(' ')
       if not all:
-        if blacklisted(story):
+        logging.debug(post.prettify().encode('utf-8'))
+        if blocklisted(story):
           continue
         header_div = post.find_previous_sibling('div')
         if header_div:
           header = header_div.find('h3')
-          if header and blacklisted(header.get_text(' ')):
+          if header and blocklisted(header.get_text(' ')):
             continue
 
       # strip footer sections:

@@ -3,4 +3,4 @@
 /.eggs/
 /*.egg-info
 /l
-/local/
+/local*/
