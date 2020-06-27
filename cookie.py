@@ -67,7 +67,7 @@ CACHE_EXPIRATION = datetime.timedelta(minutes=15)
 # help prevent false positives.
 BLOCKLIST = frozenset([
   re.compile(r'  (are now friends|is now friends with|(also )?commented on|added \d+ comments on|[Ll]ike([ds])?|reacted to|replied to|followed|is going to|is interested in|donated to)(  ?| this| an?)'),
-  re.compile(r'  ((was|were) (mentioned|tagged)( in( an?| this)?|>) )?'),
+  re.compile(r'  ((was|were) (mentioned|tagged)( in( an?| this)?|>)?)'),
   re.compile(r"  (wrote on|shared a  .+  to)  .+ 's (wall|timeline)", re.I),
   re.compile(r' Add Friend$', re.I),
   re.compile(r"A Video You May Like|Popular Across Facebook|Similar to Posts You've Interacted With|Suggested (for You|Post)", re.I),
