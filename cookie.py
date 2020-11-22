@@ -16,13 +16,13 @@ HEADER = """\
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xml:lang="en-US"
       xmlns="http://www.w3.org/2005/Atom"
-      xml:base="https://m.facebook.com/">
+      xml:base="https://mbasic.facebook.com/">
 <id>https://facebook-atom.appspot.com/</id>
 <title>facebook-atom feed</title>
 <logo>https://static.xx.fbcdn.net/rsrc.php/v2/yp/r/eZuLK-TGwK1.png</logo>
 <updated>%(updated)s</updated>
 
-<link href="https://m.facebook.com/?sk=h_chr" rel="alternate" type="text/html" />
+<link href="https://mbasic.facebook.com/?sk=h_chr" rel="alternate" type="text/html" />
 <link href="https://facebook-atom.appspot.com/"
       rel="self" type="application/atom+xml" />
 """
@@ -85,7 +85,7 @@ def blocklisted(string):
 def clean_url(url):
   parsed = urllib.parse.urlparse(url)
   if parsed.netloc not in ('', 'm.facebook.com', 'lm.facebook.com',
-                           'www.facebook.com'):
+                           'mbasic.facebook.com', 'www.facebook.com'):
     return url
 
   path = parsed.path
@@ -123,7 +123,7 @@ class CookieHandler(handlers.ModernHandler):
     logging.info('Fetching with Cookie: %s', cookie)
     resp = urllib.request.urlopen(urllib.request.Request(
       # ?sk=hcr uses the Most Recent news feed option (instead of Top Stories)
-      'https://m.facebook.com/?sk=h_chr',
+      'https://mbasic.facebook.com/?sk=h_chr',
       headers={
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
         'Cookie': cookie.encode('utf-8'),
