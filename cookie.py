@@ -40,15 +40,21 @@ class CookieHandler(handlers.ModernHandler):
     c_user = util.get_required_param(self, 'c_user')
     xs = util.get_required_param(self, 'xs')
     fb = facebook.Facebook(scrape=True, cookie_c_user=c_user, cookie_xs=xs)
-    activities = fb.get_activities(user_id=c_user, group_id='@self')
+    activities = fb.get_activities()
     logging.info(f'Got {len(activities)} activities')
+
+    all = self.request.get('all', '').lower() == 'true'
+    if all:
+      logging.info('Ignoring blocklist and returning all items due to all=true!')
+    else:
+      activities = [a for a in activities if not blocklisted(a.get('content', ''))]
 
     self.response.headers['Content-Type'] = 'application/atom+xml'
     self.response.out.write(atom.activities_to_atom(
-      activities, {}, title='facebook-atom feed for TODO',
+      activities, {}, title='facebook-atom feed',
       host_url=self.request.host_url + '/',
       request_url=self.request.path_url,
-      xml_base='https://mbasic.facebook.com/'))
+      xml_base=facebook.M_HTML_BASE_URL))
 
 
 application = webapp2.WSGIApplication([
