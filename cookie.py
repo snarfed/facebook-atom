@@ -11,6 +11,9 @@ import webapp2
 
 CACHE_EXPIRATION = datetime.timedelta(minutes=15)
 
+# See https://www.cloudimage.io/
+IMAGE_PROXY_URL_BASE = 'https://aujtzahimq.cloudimg.io/v7/'
+
 # don't show stories with titles or headers that contain one of these regexps.
 #
 # the double spaces are intentional. it's how FB renders these stories. should
@@ -49,6 +52,22 @@ class CookieHandler(handlers.ModernHandler):
     else:
       activities = [a for a in activities if not blocklisted(a.get('content', ''))]
 
+    # Pass images through image proxy to cache them
+    for a in activities:
+      obj = a.get('object')
+      for elem in ([obj, obj.get('author'), a.get('actor')] +
+                   obj.get('replies', {}).get('items', []) +
+                   obj.get('attachments', []) +
+                   obj.get('tags', [])):
+        if elem:
+          for img in util.get_list(elem, 'image'):
+            url = img.get('url')
+            if url and not url.startswith(IMAGE_PROXY_URL_BASE):
+              # Note that url isn't URL-encoded here, that's intentional.
+              # cloudimage.io doesn't decode it.
+              img['url'] = IMAGE_PROXY_URL_BASE + url
+
+    # Generate output
     self.response.headers['Content-Type'] = 'application/atom+xml'
     self.response.out.write(atom.activities_to_atom(
       activities, {}, title='facebook-atom feed',
