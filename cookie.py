@@ -5,7 +5,7 @@ import logging
 import operator
 import re
 
-from granary import atom, facebook
+from granary import atom, facebook, microformats2
 from oauth_dropins.webutil import appengine_config, appengine_info, handlers, util
 import webapp2
 
@@ -54,18 +54,7 @@ class CookieHandler(handlers.ModernHandler):
 
     # Pass images through image proxy to cache them
     for a in activities:
-      obj = a.get('object')
-      for elem in ([obj, obj.get('author'), a.get('actor')] +
-                   obj.get('replies', {}).get('items', []) +
-                   obj.get('attachments', []) +
-                   obj.get('tags', [])):
-        if elem:
-          for img in util.get_list(elem, 'image'):
-            url = img.get('url')
-            if url and not url.startswith(IMAGE_PROXY_URL_BASE):
-              # Note that url isn't URL-encoded here, that's intentional.
-              # cloudimage.io doesn't decode it.
-              img['url'] = IMAGE_PROXY_URL_BASE + url
+      microformats2.prefix_image_urls(a, IMAGE_PROXY_URL_BASE)
 
     # Generate output
     self.response.headers['Content-Type'] = 'application/atom+xml'
