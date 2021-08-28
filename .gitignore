@@ -2,5 +2,6 @@
 /dist/
 /.eggs/
 /*.egg-info
+/flask_secret_key
 /l
 /local*/
