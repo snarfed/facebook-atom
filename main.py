@@ -57,8 +57,8 @@ def blocklisted(string):
 @app.route('/cookie')
 @flask_util.cached(cache, CACHE_EXPIRATION)
 def feed():
-  c_user = request.args['c_user']
-  xs = request.args['xs']
+  c_user = flask_util.get_required_param('c_user')
+  xs = flask_util.get_required_param('xs')
   fb = facebook.Facebook(scrape=True, cookie_c_user=c_user, cookie_xs=xs)
   activities = fb.get_activities()
   logging.info(f'Got {len(activities)} activities')
