@@ -8,6 +8,7 @@ import re
 from flask import Flask, render_template, request
 from flask.views import View
 from flask_caching import Cache
+import flask_gae_static
 from granary import atom, facebook, microformats2
 from oauth_dropins.webutil import appengine_config, appengine_info, flask_util, util
 
@@ -40,6 +41,7 @@ app.config.from_mapping(
 )
 app.after_request(flask_util.default_modern_headers)
 app.register_error_handler(Exception, flask_util.handle_exception)
+flask_gae_static.init_app(app)
 app.wsgi_app = flask_util.ndb_context_middleware(
     app.wsgi_app, client=appengine_config.ndb_client)
 
