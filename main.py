@@ -62,7 +62,7 @@ def feed():
   c_user = flask_util.get_required_param('c_user')
   xs = flask_util.get_required_param('xs')
   fb = facebook.Facebook(scrape=True, cookie_c_user=c_user, cookie_xs=xs)
-  activities = fb.get_activities()
+  activities = fb.get_activities(log_html=(c_user == '212038'))  # me, for debugging
   logging.info(f'Got {len(activities)} activities')
 
   all = request.values.get('all', '').lower() == 'true'
