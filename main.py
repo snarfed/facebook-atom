@@ -32,7 +32,7 @@ BLOCKLIST = frozenset([
 ])
 
 # Flask app
-app = Flask('facebook-atom')
+app = Flask('facebook-atom', static_folder=None)
 app.template_folder = './templates'
 app.config.from_mapping(
     ENV='development' if appengine_info.DEBUG else 'production',
@@ -69,7 +69,8 @@ def feed():
   if all:
     logging.info('Ignoring blocklist and returning all items due to all=true!')
   else:
-    activities = [a for a in activities if not blocklisted(a.get('content', ''))]
+    activities = [a for a in activities if not
+                  blocklisted(a.get('object', {}).get('content', ''))]
 
   # Pass images and videos through caching proxy to cache them
   for a in activities:
