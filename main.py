@@ -9,7 +9,7 @@ from flask import Flask, render_template, request
 from flask.views import View
 from flask_caching import Cache
 import flask_gae_static
-from granary import atom, facebook, microformats2
+from granary import as1, atom, facebook
 from oauth_dropins.webutil import appengine_config, appengine_info, flask_util, util
 
 CACHE_EXPIRATION = datetime.timedelta(minutes=15)
@@ -74,8 +74,8 @@ def feed():
 
   # Pass images and videos through caching proxy to cache them
   for a in activities:
-    microformats2.prefix_image_urls(a, IMAGE_PROXY_URL_BASE)
-    microformats2.prefix_video_urls(a, VIDEO_PROXY_URL_BASE)
+    as1.prefix_urls(a, 'image', IMAGE_PROXY_URL_BASE)
+    as1.prefix_urls(a, 'stream', VIDEO_PROXY_URL_BASE)
 
   # Generate output
   return atom.activities_to_atom(
