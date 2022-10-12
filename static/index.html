@@ -4,21 +4,6 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <title>Facebook Atom feeds</title>
 <link href="/static/style.css" rel="stylesheet" type="text/css" />
-
-<script type="text/javascript">
-function render() {
-  c_user = document.getElementById("c_user").value.trim();
-  xs = document.getElementById("xs").value.trim();
-
-  document.getElementById("link-div").style.color =
-    (c_user && xs) ? "black" : "lightgray";
-
-  url = window.location + "cookie?c_user=" + c_user + "&xs=" + xs;
-  document.getElementById("link").innerHTML =
-    (c_user && xs) ? "<a href='" + url + "'>" + url + "</a>" : url;
-}
-window.onload = render;
-</script>
 </head>
 
 <body>
@@ -27,25 +12,15 @@ window.onload = render;
   <p id="title"><span>Facebook Atom feeds</span></p>
 </div>
 
-<div id="body">
+<p><b><em>This site is temporarily offline for new feeds. We're working on bringing it back via a browser extension. Watch this space!</em></b></p>
+
+<div id="body" class="disabled">
 <p>Want an Atom feed of your
 <a href="https://www.facebook.com/help/newsfeed">Facebook news feed</a>,
 ie your friends' posts, that you can subscribe to and read in your favorite
 feed reader?</p>
 
-<p><a href="http://www.wikihow.com/View-Cookies" target="_blank">Follow these
-instructions</a> to extract the two <code>facebook.com</code> cookies
-named <code>c_user</code> and <code>xs</code> from your browser and paste them
-below.</p>
-
-<nobr>
- <label for="c_user">c_user</label>
- <input type="text" id="c_user" onChange="render()" onKeyUp="render()" />
-</nobr>
-<nobr>
- <label for="xs">xs</label>
- <input type="text" id="xs" onChange="render()" onKeyUp="render()" />
-</nobr>
+<p>...</p>
 
 <div id="link-div">
 <p>Now add this link to your feed reader, and you're done!</p>
@@ -61,6 +36,7 @@ data, username, password, or cookie. It only reformats your news feed and passes
 it to your feed reader when requested. You can confirm by
 <a href="https://github.com/snarfed/facebook-atom">examining its source code</a>.
 </p>
+</div>
 
 <div id="bottom"></div>
 
