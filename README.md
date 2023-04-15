@@ -1,6 +1,8 @@
 facebook-atom
 =============
 
+_This service is now closed. So long, and thanks for all the fish!️_
+
 A webapp that generates and serves an Atom feed of your Facebook news feed, ie posts from your friends.
 
 https://facebook-atom.appspot.com/
